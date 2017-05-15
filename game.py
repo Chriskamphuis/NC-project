@@ -1,7 +1,4 @@
 import numpy as np
-import time
-from tqdm import tqdm
-
 
 class Game:
 
@@ -15,7 +12,7 @@ class Game:
         self.board = board
         if board is None:
             self.board = np.zeros((6, 7), dtype=np.int8)
- 
+        (self.height, self.width) = self.board.shape
  
             
     # Function to add player to game (sign-in)
@@ -42,9 +39,9 @@ class Game:
     # Function that returns a list of legal moves in the current board
     def get_legal_moves(self):
         legal_moves = list()
-        for move in range(0, 7):
+        for move in range(0, self.width):
             played = sum([1 for e in self.board[:, move] if e != 0])
-            if (played <= 5):
+            if (played < self.height):
                 legal_moves.append(move)
         return legal_moves
   
@@ -71,12 +68,12 @@ class Game:
     def play_move(self, move, value):
         played = sum([1 for e in self.board[:, move] if e != 0])
         
-        if played > 5:
+        if played > self.height-1:
             raise ValueError('The column is already full')
         
-        self.board[5-played, move] = value
+        self.board[self.height-1-played, move] = value
         
-        if (self.end_state(move, 5-played, value)):
+        if (self.end_state(move, self.height-1-played, value)):
             return value
         else:
             return 0
@@ -96,7 +93,7 @@ class Game:
             return True
             
         # Check for downwards diagonal
-        elif (self.check_neighbour(col, row, value, -1, 1) + self.check_neighbour(col, row+1, value-2, 1, -1) >= 4):
+        elif (self.check_neighbour(col, row, value, -1, 1) + self.check_neighbour(col+1, row-1, value, 1, -1) >= 4):
             return True
         
         # No connect-four found     
@@ -104,7 +101,7 @@ class Game:
     
     # Recursive function to check if neighbour in direction (dx,dy) has the same value    
     def check_neighbour(self, col, row, value, dx, dy):
-        if (col < 0 or col >= 7 or row < 0 or row >= 6):
+        if (col < 0 or col >= self.width or row < 0 or row >= self.height):
             return 0
     
         elif (self.board[row, col] == value):
@@ -115,7 +112,7 @@ class Game:
             
     # Function that resets the board
     def reset_board(self):
-        self.board = np.zeros((6, 7), dtype=np.int8)
+        self.board = self.board * 0
       
         
         
