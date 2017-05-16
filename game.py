@@ -1,5 +1,7 @@
 import numpy as np
 
+from player import *
+
 class Game:
 
     def __init__(self, board=None):
@@ -29,12 +31,8 @@ class Game:
         temp = self.playerOne
         self.playerOne = self.playerTwo
         self.playerTwo = temp
-        
-
-
-    # Return instance of the board
-    def get_board(self):
-        return self.board.copy()
+   
+   
         
     # Function that returns a list of legal moves in the current board
     def get_legal_moves(self):
@@ -46,11 +44,12 @@ class Game:
         return legal_moves
   
     # Function to play a single game. Player that starts is given as argument
-    def play_game(self, player):
+    def play_game(self):
         
+        player = self.playerOne
         winner = 0
         while(winner == 0 and self.not_full()):
-            move = player.get_move(self.get_legal_moves())
+            move = player.get_move(self.board.copy(), self.get_legal_moves())
             
             winner = self.play_move(move, player.value)
             
@@ -113,3 +112,51 @@ class Game:
     # Function that resets the board
     def reset_board(self):
         self.board = self.board * 0
+      
+      
+    ###########################################################################  
+    # Plays a random game from a given board position, then returns the score #
+    ###########################################################################
+    
+    def sample_game(self, board, last_player, nr_samples):
+    
+        # Save current board to memory
+        current_board = self.board
+        old_playerOne = self.playerOne
+        old_playerTwo = self.playerTwo
+        
+        # Determine starting random player from given position
+        if (last_player == self.playerOne):
+            self.playerOne = Player(self, self.playerTwo.value, False)
+            self.playerTwo = Player(self, self.playerOne.value, False)
+        else:
+            self.playerOne = Player(self, self.playerOne.value, False)
+            self.playerTwo = Player(self, self.playerTwo.value, False)
+        
+        # Play nr_samples random games
+        score = 0.0
+        for _ in range(nr_samples):
+        
+            # Set input board a start point
+            self.board = board
+
+            # Play random game
+            winner = self.play_game()
+    
+            # Add to score
+            if (winner == last_player.value):
+                score += 1.0
+            elif (winner == 0):
+                score += 0.5        
+            else:
+                score += 0.0
+            
+        # Place original settings back
+        self.board = current_board
+        self.playerOne = old_playerOne
+        self.playerTwo = old_playerTwo
+        
+        # Return final score
+        return score/nr_samples
+        
+        
