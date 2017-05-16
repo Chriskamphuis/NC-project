@@ -113,11 +113,3 @@ class Game:
     # Function that resets the board
     def reset_board(self):
         self.board = self.board * 0
-      
-        
-        
-        
-        
-        
-        
-        
