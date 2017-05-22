@@ -77,7 +77,7 @@ class EndStatePlayer(Player):
             
             # Get prediction on post_board
             input_arr = self.board_2_input(post_board)
-            (pred, _) = self.network.predict(input_arr)
+            pred = self.network.predict(input_arr)
             
             if best_move == -1 or pred > best_pred:
                 best_move = move
@@ -92,11 +92,8 @@ class EndStatePlayer(Player):
         # Convert board to input shape
         input_arr = self.board_2_input(board)
         
-        # Get prediction on post_board
-        (pred, cache) = self.network.predict(input_arr)
-        
         # Train network on board and score
-        self.network.train(score, pred, cache)
+        self.network.train(input_arr, score)
         
 #####################
 # Q-LEARNING PLAYER #
@@ -121,7 +118,7 @@ class QLearningPlayer(Player):
         # Variables that remember best move data
         best_move = -1
         best_pred = 0
-        best_cache = None
+        best_input = None
         
         for move in legal_moves:
             
@@ -132,15 +129,15 @@ class QLearningPlayer(Player):
             
             # Get prediction on post_board
             input_arr = self.board_2_input(board)
-            (pred, cache) = self.network.predict(input_arr)
+            pred = self.network.predict(input_arr)
             
             if best_move == -1 or pred > best_pred:
                 best_move = move
                 best_pred = pred
-                best_cache = cache
+                best_input = input_arr
         
         # Add board to memory
-        self.memory.append((best_pred, best_cache))
+        self.memory.append(best_input)
         
         return best_move
     
@@ -150,17 +147,17 @@ class QLearningPlayer(Player):
         
         # Get prediction on post_board
         input_arr = self.board_2_input(board)
-        (pred, cache) = self.network.predict(input_arr)
+        pred = self.network.predict(input_arr)
     
         # Add final state and score to memory
-        self.memory.append((score, cache))
+        self.memory.append(score)
         
         # Train network via Q-learning
         real_util = score
-        for (mem_util, mem_cache) in self.memory:
+        for mem_board in self.memory:
         
             # Train network on board and memorized utility
-            self.network.train(real_util, mem_util, mem_cache)
+            self.network.train(mem_input, real_util)
             
             # Apply discount factor
             real_util = real_util * self.discount
@@ -192,7 +189,7 @@ class MonteCarloPlayer(Player):
         # Variables that remember best move data
         best_move = -1
         best_pred = 0
-        best_cache = None
+        best_input = None
         
         for move in legal_moves:
             
@@ -203,19 +200,19 @@ class MonteCarloPlayer(Player):
             
             # Get prediction on post_board
             input_arr = self.board_2_input(board)
-            (pred, cache) = self.network.predict(input_arr)
+            pred = self.network.predict(input_arr)
             
             # Update best move and score
             if (best_move == -1 or pred > best_pred):
                 best_move = move
                 best_pred = pred
-                best_cache = cache
+                best_input = input_arr
         
         # Determine Monte Carlo based score
-        score = self.game.sample_game(post_board, self, self.nr_samples)
+        sample_score = self.game.sample_game(post_board, self, self.nr_samples)
         
         # Train network on score and best choice
-        self.network.train(score, best_pred, best_cache)
+        self.network.train(best_input, sample_score)
         
         return best_move
         
