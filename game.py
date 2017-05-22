@@ -4,35 +4,23 @@ from player import *
 
 class Game:
 
-    def __init__(self, board=None):
+    def __init__(self, board=None, playerOne, playerTwo):
         
         # Define players
-        self.playerOne = None
-        self.playerTwo = None
+        self.playerOne = playerOne
+        self.playerTwo = playerTwo
 
         # Define the board
         self.board = board
         if board is None:
             self.board = np.zeros((6, 7), dtype=np.int8)
         (self.height, self.width) = self.board.shape
- 
-            
-    # Function to add player to game (sign-in)
-    def set_player(self, player):
-        if self.playerOne == None:
-            self.playerOne = player
-        elif self.playerTwo == None:
-            self.playerTwo = player
-        else:
-            print("Cannot have more than two players.\nPlayer with value {0} refused.".format(player.value))
             
     # Function to switch players (who goes first)
     def switch_players(self):
         temp = self.playerOne
         self.playerOne = self.playerTwo
         self.playerTwo = temp
-   
-   
         
     # Function that returns a list of legal moves in the current board
     def get_legal_moves(self):

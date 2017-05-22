@@ -11,14 +11,8 @@ import numpy as np
 
 class Player():
 
-    def __init__(self, game, value, sign_in = True):
-        self.game = game
+    def __init__(self, value, sign_in = True):
         self.value = value
-    
-        # sign into game
-        if (sign_in):
-            game.set_player(self)
-        
         
     # Translates a board into a three-dimensional input array for the neural nets
     # Here dimension 1 is always empty, 2 own moves, 3 opponents' moves
@@ -51,14 +45,9 @@ class Player():
 
 class EndStatePlayer(Player):      
         
-    def __init__(self, game, value, network):
-        self.game = game
+    def __init__(self, value, network):
         self.value = value
-        self.network = network
-    
-        # sign into game    
-        game.set_player(self)
-    
+        self.network = network  
         
     # Requests a move from the player, given a board
     def get_move(self, board, legal_moves):
@@ -99,16 +88,11 @@ class EndStatePlayer(Player):
 
 class QLearningPlayer(Player):
 
-    def __init__(self, game, value, network, discount=0.9):
-        self.game = game
+    def __init__(self, value, network, discount=0.9):
         self.value = value
         self.network = network
         self.discount = discount
-        self.memory = list()
-        
-        # sign into game    
-        game.set_player(self)     
-        
+        self.memory = list() 
         
     # Requests a move from the player, given a board
     def get_move(self, board, legal_moves):
@@ -171,15 +155,10 @@ class QLearningPlayer(Player):
 
 class MonteCarloPlayer(Player):
 
-    def __init__(self, game, value, network, nr_samples):
-        self.game = game
+    def __init__(self, value, network, nr_samples):
         self.value = value
         self.network = network
-        self.nr_samples = nr_samples
-        
-        # sign into game    
-        game.set_player(self)     
-        
+        self.nr_samples = nr_samples  
         
     # Requests a move from the player, given a board
     def get_move(self, board, legal_moves):
@@ -207,7 +186,9 @@ class MonteCarloPlayer(Player):
                 best_input = input_arr
         
         # Determine Monte Carlo based score
-        sample_score = self.game.sample_game(post_board, self, self.nr_samples)
+        
+        game = Game(board, self, Player(2))
+        sample_score = game.sample_game(post_board, self, self.nr_samples)
         
         # Train network on score and best choice
         self.network.train(best_input, sample_score)
