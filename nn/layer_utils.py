@@ -1,5 +1,5 @@
-from nc17nn.layers import *
-from nc17nn.fast_layers import *
+from layers import *
+from fast_layers import *
 
 
 def affine_relu_forward(x, w, b):
