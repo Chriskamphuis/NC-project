@@ -60,7 +60,7 @@ class EndStatePlayer(Player):
             # Process move on copy of board
             post_board = board.copy()
             played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[self.game.height-1-played, move] = self.value
+            post_board[board.shape[0]-1-played, move] = self.value
             
             # Get prediction on post_board
             input_arr = self.board_2_input(post_board)
@@ -107,7 +107,7 @@ class QLearningPlayer(Player):
             # Process move on copy of board
             post_board = board.copy()
             played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[self.game.height-1-played, move] = self.value
+            post_board[board.shape[0]-1-played, move] = self.value
             
             # Get prediction on post_board
             input_arr = self.board_2_input(board)
@@ -173,7 +173,7 @@ class MonteCarloPlayer(Player):
             # Process move on copy of board
             post_board = board.copy()
             played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[self.game.height-1-played, move] = self.value
+            post_board[board.shape[0]-1-played, move] = self.value
             
             # Get prediction on post_board
             input_arr = self.board_2_input(board)

@@ -20,29 +20,29 @@ net = Network("Endstate1", [3, 6, 7], 0.15)
 
 #p1 = Player(1)
 p1 = EndStatePlayer(1, net)
-#p1 = MonteCarloPlayer(1, net1, 10)
+#p1 = MonteCarloPlayer(1, net, 10)
 #p1 = QLearningPlayer(1, net1, 0.9)
 
 net2 = Network("Endstate2", [3, 6, 7], 0.15)
 
-#p2 = Player(2)
-p2 = EndStatePlayer(2, net)
-#p2 = MonteCarloPlayer(2, net2, 10)
+p2 = Player(2)
+#p2 = EndStatePlayer(2, net)
+#p2 = MonteCarloPlayer(2, net, 10)
 #p2 = QLearningPlayer(2, net2, 0.9)
 
 board = np.zeros((6, 7), dtype=np.int8)
-g = Game(board, p1, p2)
+g = Game(p1, p2, board)
 
 start = time.time()
 
 epochs = 25
-iterations = 100
+iterations = 1000
 
 winners = 0.0
-for i in tqdm(range(epochs)):   
+for i in range(epochs):   
 
     # Training cycle
-    for _ in range(iterations):
+    for _ in tqdm(range(iterations)):
 
         winner = g.play_game()
     
@@ -61,20 +61,23 @@ for i in tqdm(range(epochs)):
         g.reset_board()
         g.switch_players()
         
-    # Test cycle
+    # Validation cycle
     wins = 0.0
     draws = 0.0
-    test_game = Game(board, p1, Player(2))
-    for _ in range(iterations):
+    test_game = Game(p1, Player(2), board)
+    for _ in tqdm(range(iterations)):
         winner = test_game.play_game()
         
         if (winner == p1.value):
             wins += 1.0
             
-        elif (winner != 0):
+        elif (winner == 0):
             draws += 1.0
+
+        test_game.reset_board()
+        test_game.switch_players()
             
-    print "Epoch {0}:".format(i)
+    print "Epoch {0}:".format(i+1)
     print "Win percentage: {0}".format(wins/iterations)
     print "Draw percentage: {0}".format(draws/iterations)
 
