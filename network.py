@@ -2,7 +2,6 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 from IPython import display
-%matplotlib inline
 
 import lasagne
 import lasagne.layers as L
@@ -16,13 +15,13 @@ class Network():
         self.learning_rate = learning_rate
         
         # Input tensors for data and targets
-        self.input_tensor  = T.dmatrix('input')
-        self.target_tensor = T.dmatrix('targets')
+        self.input_tensor  = T.tensor4('input')
+        self.target_tensor = T.fscalar('targets')
 
         # Build the network
         self.network = self.build_network(input_size)
-        self.train_fn = self.training_function(network, self.input_tensor, self.target_tensor, learning_rate)
-        self.predict_fn = self.evaluate_function(network, self.input_tensor)
+        self.train_fn = self.training_function(self.network, self.input_tensor, self.target_tensor, learning_rate)
+        self.predict_fn = self.evaluate_function(self.network, self.input_tensor)
                                             
                                                
     def build_network(self, input_size):
@@ -53,7 +52,7 @@ class Network():
         
         return (loss, params)
 
-    def training_function(network, input_tensor, target_tensor, learning_rate):
+    def training_function(self, network, input_tensor, target_tensor, learning_rate):
         
         # Get the network output and calculate loss.
         network_output = L.get_output(network)
@@ -68,7 +67,7 @@ class Network():
         # Construct the training function.
         return theano.function([input_tensor, target_tensor], [loss], updates=weight_updates)
 
-    def evaluate_function(network, input_tensor):
+    def evaluate_function(self, network, input_tensor):
     
         # Get the network output and calculate metrics.
         network_output = L.get_output(network, input_tensor, deterministic=True)

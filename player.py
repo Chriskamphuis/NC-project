@@ -1,9 +1,7 @@
 from game import *
 from random import randint
 
-
 from network import *
-
 
 import numpy as np
 
@@ -28,12 +26,12 @@ class Player():
         shape = board.shape
         
         # Create input shape
-        input_arr = np.zeros((3, shape[0], shape[1]), dtype=np.int8)
+        input_arr = np.zeros((1, 3, shape[0], shape[1]), dtype=np.int8)
         
         # Fill each dimension
-        input_arr[0,:,:] = (board == 0).astype(int)
-        input_arr[1,:,:] = (board == self.value).astype(int)
-        input_arr[2,:,:] = input_arr[0,:,:] == input_arr[1,:,:]
+        input_arr[:,0,:,:] = (board == 0).astype(int)
+        input_arr[:,1,:,:] = (board == self.value).astype(int)
+        input_arr[:,2,:,:] = input_arr[:,0,:,:] == input_arr[:,1,:,:]
         
         return input_arr  
         

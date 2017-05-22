@@ -1,12 +1,10 @@
 from game import *
 from player import *
+from network import *
 from tqdm import tqdm
 
 import numpy as np
 import time
-
-
-from network import *
 
 ##########
 def printGame(board, winner):
@@ -21,7 +19,7 @@ def printGame(board, winner):
 board = np.zeros((6, 7), dtype=np.int8)
 
 g = Game(board)
-net = Network()
+net = Network("Endstate", [3, 6, 7], 0.15)
 
 #p1 = Player(g, 1)
 p1 = EndStatePlayer(g, 1, net)
