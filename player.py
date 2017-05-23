@@ -75,7 +75,7 @@ class EndStatePlayer(Player):
     
     # Function to start the training process    
     def tell_outcome (self, board, score):
-    
+
         # Convert board to input shape
         input_arr = self.board_2_input(board)
         

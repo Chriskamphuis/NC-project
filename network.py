@@ -22,7 +22,6 @@ class Network():
         self.network = self.build_network(input_size)
         self.train_fn = self.training_function(self.network, self.input_tensor, self.target_tensor, learning_rate)
         self.predict_fn = self.evaluate_function(self.network, self.input_tensor)
-                                            
                                                
     def build_network(self, input_size):
 
@@ -48,7 +47,7 @@ class Network():
     
     def train(self, board, label):
         loss = self.train_fn(board, label)
-        #params = lasagne.layers.get_all_param_values(self.network)
+        params = lasagne.layers.get_all_param_values(self.network)
         
         return loss #(loss, params)
 

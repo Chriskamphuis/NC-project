@@ -100,6 +100,10 @@ class Game:
     # Function that resets the board
     def reset_board(self):
         self.board = self.board * 0
+
+    # Function to print current board
+    def print_board(self):
+        print(self.board)
       
       
     ###########################################################################  
