@@ -19,9 +19,9 @@ def printGame(board, winner):
 net = Network("Endstate1", [3, 6, 7], 0.15)
 
 #p1 = Player(1)
-p1 = EndStatePlayer(1, net)
+#p1 = EndStatePlayer(1, net)
 #p1 = MonteCarloPlayer(1, net, 10)
-#p1 = QLearningPlayer(1, net1, 0.9)
+p1 = QLearningPlayer(1, net, 0.9)
 
 net2 = Network("Endstate2", [3, 6, 7], 0.15)
 
