@@ -16,7 +16,7 @@ class Network():
         
         # Input tensors for data and targets
         self.input_tensor  = T.tensor4('input')
-        self.target_tensor = T.fscalar('targets')
+        self.target_tensor = T.dscalar('targets')
 
         # Build the network
         self.network = self.build_network(input_size)
@@ -48,9 +48,9 @@ class Network():
     
     def train(self, board, label):
         loss = self.train_fn(board, label)
-        params = lasagne.layers.get_all_param_values(self.network)
+        #params = lasagne.layers.get_all_param_values(self.network)
         
-        return (loss, params)
+        return loss #(loss, params)
 
     def training_function(self, network, input_tensor, target_tensor, learning_rate):
         

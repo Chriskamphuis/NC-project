@@ -16,19 +16,19 @@ def printGame(board, winner):
         print "\nThe game was a draw. (Boring!)"
 #########
 
-net = Network("Endstate1", [3, 6, 7], 0.15)
+net1 = Network("Endstate1", [3, 6, 7], 0.15)
 
 #p1 = Player(1)
-p1 = EndStatePlayer(1, net)
+#p1 = EndStatePlayer(1, net1)
 #p1 = MonteCarloPlayer(1, net, 10)
-#p1 = QLearningPlayer(1, net1, 0.9)
+p1 = QLearningPlayer(1, net1, 0.9)
 
 net2 = Network("Endstate2", [3, 6, 7], 0.15)
 
-p2 = Player(2)
-#p2 = EndStatePlayer(2, net)
+#p2 = Player(2)
+#p2 = EndStatePlayer(2, net2)
 #p2 = MonteCarloPlayer(2, net, 10)
-#p2 = QLearningPlayer(2, net2, 0.9)
+p2 = QLearningPlayer(2, net2, 0.9)
 
 board = np.zeros((6, 7), dtype=np.int8)
 g = Game(p1, p2, board)
@@ -65,7 +65,7 @@ for i in range(epochs):
     wins = 0.0
     draws = 0.0
     test_game = Game(p1, Player(2), board)
-    for _ in tqdm(range(iterations)):
+    for _ in tqdm(range(iterations/10)):
         winner = test_game.play_game()
         
         if (winner == p1.value):
@@ -78,8 +78,8 @@ for i in range(epochs):
         test_game.switch_players()
             
     print "Epoch {0}:".format(i+1)
-    print "Win percentage: {0}".format(wins/iterations)
-    print "Draw percentage: {0}".format(draws/iterations)
+    print "Win percentage: {0}".format(wins/(iterations/10))
+    print "Draw percentage: {0}".format(draws/(iterations/10))
 
     
 print "Done!"
