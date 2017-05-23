@@ -27,9 +27,9 @@ class Player():
         input_arr[:,1,:,:] = (board == self.value).astype(int)
         input_arr[:,2,:,:] = input_arr[:,0,:,:] == input_arr[:,1,:,:]
         
-        return input_arr  
+        return input_arr
         
-    
+
     # Get a move (standard random move)
     def get_move(self, board, legal_moves):
         choice = randint(0, len(legal_moves)-1)        
@@ -132,14 +132,15 @@ class QLearningPlayer(Player):
         pred = self.network.predict(input_arr)
     
         # Add final state and score to memory
-        self.memory.append(score)
+        self.memory.append(input_arr)
         
         # Train network via Q-learning
-        real_util = score
-        for mem_board in self.memory:
-        
+        real_util = score - 0.5
+
+        for mem_input in self.memory[::-1]:
+
             # Train network on board and memorized utility
-            self.network.train(mem_input, real_util)
+            self.network.train(mem_input, real_util + 0.5)
             
             # Apply discount factor
             real_util = real_util * self.discount
