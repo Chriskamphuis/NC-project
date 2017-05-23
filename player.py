@@ -35,7 +35,7 @@ class Player():
         choice = randint(0, len(legal_moves)-1)        
         return legal_moves[choice]
         
-    def tell_outcome (self, board, score):
+    def tell_outcome(self, board, score):
         return ""
 
 
@@ -74,8 +74,8 @@ class EndStatePlayer(Player):
     
     
     # Function to start the training process    
-    def tell_outcome (self, board, score):
-
+    def tell_outcome(self, board, score):
+    
         # Convert board to input shape
         input_arr = self.board_2_input(board)
         
@@ -196,3 +196,47 @@ class MonteCarloPlayer(Player):
         
         return best_move
         
+
+########################
+# GENETIC STATE PLAYER #
+########################
+
+class EndStatePlayer(Player):      
+        
+    def __init__(self, value, network):
+        self.value = value
+        self.network = network  
+        
+    # Requests a move from the player, given a board
+    def get_move(self, board, legal_moves):
+        
+        best_move = -1
+        best_pred = 0
+        
+        for move in legal_moves:
+            
+            # Process move on copy of board
+            post_board = board.copy()
+            played = sum([1 for e in post_board[:, move] if e != 0])
+            post_board[board.shape[0]-1-played, move] = self.value
+            
+            # Get prediction on post_board
+            input_arr = self.board_2_input(post_board)
+            pred = self.network.predict(input_arr)
+            
+            if best_move == -1 or pred > best_pred:
+                best_move = move
+                best_pred = pred
+        
+        return best_move
+    
+    
+    # Function to start the training process    
+    def tell_outcome (self, board, score):
+    
+        # Convert board to input shape
+        input_arr = self.board_2_input(board)
+        
+        # Train network on board and score
+        self.network.train(input_arr, score)
+ 
