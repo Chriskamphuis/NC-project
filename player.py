@@ -264,4 +264,5 @@ class GeneticPlayer(Player):
                     fitness[self.population.networks.index(perm[1])] += .5
 
         self.population.train(fitness)
+        self.population.apply_mutation()
 

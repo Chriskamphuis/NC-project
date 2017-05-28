@@ -56,5 +56,20 @@ class Population():
                 new_pop.append(self.copy(net))
         self.networks = new_pop
 
+    def apply_crossover(self):
+        return
+
+    def apply_mutation(self):
+        for network in self.networks:
+            for layer in network.layers:
+                if type(layer) == Conv2D or type(layer) == Dense:
+                    weights = layer.get_weights()
+                    w = weights[0]
+                    b = weights[1]
+                    w += np.random.normal(scale=self.mutation, size=w.shape)
+                    b += np.random.normal(scale=self.mutation, size=b.shape)
+                    layer.set_weights([w, b])
+
 if __name__ == '__main__':
     p = Population()
+    p.apply_mutation()
