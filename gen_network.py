@@ -56,7 +56,28 @@ class Population():
                 new_pop.append(self.copy(net))
         self.networks = new_pop
 
+    # Swaps conv filters using crossover with probability self.crossover
     def apply_crossover(self):
+        amount_filters = 0
+        for network in p.networks:
+            for layer in network.layers:
+                if type(layer) is Conv2D:
+                    weights = layer.get_weights()[0]
+                    amount_filters += weights.shape[2] * weights.shape[3]
+        to_change = np.random.choice(amount_filters,
+                                     size=(int(self.crossover *
+                                               amount_filters *
+                                               2)),
+                                     replace=False)
+        fil_from = to_change[:len(to_change)/2]
+        fil_to = to_change[len(to_change)/2:]
+
+        # TODO: check if fil_from and fil_to are equal length
+        for i in range(len(fil_from)):
+            self.swap_filters(fil_from[i], fil_to[i])
+
+    def swap_filters(self, filter1, filter2):
+        # TODO: Swap the filters at locations filter1 and filter2
         return
 
     def apply_mutation(self):
@@ -72,4 +93,4 @@ class Population():
 
 if __name__ == '__main__':
     p = Population()
-    p.apply_mutation()
+    p.apply_crossover()

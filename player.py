@@ -266,3 +266,6 @@ class GeneticPlayer(Player):
         self.population.train(fitness)
         self.population.apply_mutation()
 
+    def give_outcome(self):
+        pass
+
