@@ -5,7 +5,7 @@ from keras.models import Sequential
 
 class Population():
 
-    def __init__(self, name='gen', input_size=(3, 6, 7),
+    def __init__(self, name='genetic player', input_size=(3, 6, 7),
                  crossover=0.01, mutation=0.01,
                  population_size=5, elitism=True):
         # Parameters
@@ -55,3 +55,6 @@ class Population():
                                         p=fscores):
                 new_pop.append(self.copy(net))
         self.networks = new_pop
+
+if __name__ == '__main__':
+    p = Population()
