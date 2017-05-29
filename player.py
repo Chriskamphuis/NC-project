@@ -8,6 +8,8 @@ import numpy as np
 from itertools import permutations
 from tqdm import tqdm
 
+import lasagne.layers as L
+
 #################
 # RANDOM PLAYER #
 #################
@@ -24,12 +26,12 @@ class Player():
         shape = board.shape
 
         # Create input shape
-        input_arr = np.zeros((1, 3, shape[0], shape[1]), dtype=np.int32)
+        input_arr = np.zeros((1, 3, shape[0], shape[1]), dtype=np.float32)
 
         # Fill each dimension
-        input_arr[:,0,:,:] = (board == 0).astype(int)
-        input_arr[:,1,:,:] = (board == self.value).astype(int)
-        input_arr[:,2,:,:] = (input_arr[:,0,:,:] == input_arr[:,1,:,:]).astype(int)
+        input_arr[:,0,:,:] = (board == 0).astype(np.float32)
+        input_arr[:,1,:,:] = (board == self.value).astype(np.float32)
+        input_arr[:,2,:,:] = (input_arr[:,0,:,:] == input_arr[:,1,:,:]).astype(np.float32)
 
         return input_arr
 
@@ -84,7 +86,14 @@ class EndStatePlayer(Player):
         input_arr = self.board_2_input(board)
 
         # Train network on board and score
+        #net = self.network.network
+        #pre_pars = L.get_all_param_values(net)
+        
         self.network.train(input_arr, score)
+
+        #post_pars = L.get_all_param_values(net)
+
+        #print (pre_pars[0] - post_pars[0]).all()
 
 #####################
 # Q-LEARNING PLAYER #

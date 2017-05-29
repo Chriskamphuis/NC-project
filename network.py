@@ -15,8 +15,8 @@ class Network():
         self.learning_rate = learning_rate
         
         # Input tensors for data and targets
-        self.input_tensor  = T.tensor4('input')
-        self.target_tensor = T.dscalar('targets')
+        self.input_tensor  = T.ftensor4('input')
+        self.target_tensor = T.fscalar('targets')
 
         # Build the network
         self.network = self.build_network(input_size)

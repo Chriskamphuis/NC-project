@@ -41,6 +41,9 @@ class Game:
             move = player.get_move(self.board.copy(), self.get_legal_moves(), training)
             
             winner = self.play_move(move, player.value)
+
+            #if(training==False):
+                #self.print_board()
             
             if (player == self.playerOne):
                 player = self.playerTwo
@@ -100,10 +103,12 @@ class Game:
             
     # Function that resets the board
     def reset_board(self):
-        self.board = self.board * 0
+        #self.board = self.board * 0
+        self.board = np.zeros((6, 7), dtype=np.int8)
 
     # Function to print current board
     def print_board(self):
+        print("printing board")
         print(self.board)
       
       
