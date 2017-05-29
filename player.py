@@ -24,18 +24,18 @@ class Player():
         shape = board.shape
 
         # Create input shape
-        input_arr = np.zeros((1, 3, shape[0], shape[1]), dtype=np.int8)
+        input_arr = np.zeros((1, 3, shape[0], shape[1]), dtype=np.int32)
 
         # Fill each dimension
         input_arr[:,0,:,:] = (board == 0).astype(int)
         input_arr[:,1,:,:] = (board == self.value).astype(int)
-        input_arr[:,2,:,:] = input_arr[:,0,:,:] == input_arr[:,1,:,:]
+        input_arr[:,2,:,:] = (input_arr[:,0,:,:] == input_arr[:,1,:,:]).astype(int)
 
         return input_arr
 
 
     # Get a move (standard random move)
-    def get_move(self, board, legal_moves):
+    def get_move(self, board, legal_moves, training):
         choice = randint(0, len(legal_moves)-1)
         return legal_moves[choice]
 
@@ -54,7 +54,7 @@ class EndStatePlayer(Player):
         self.network = network
 
     # Requests a move from the player, given a board
-    def get_move(self, board, legal_moves):
+    def get_move(self, board, legal_moves, training):
 
         best_move = -1
         best_pred = 0
@@ -99,7 +99,7 @@ class QLearningPlayer(Player):
         self.memory = list()
 
     # Requests a move from the player, given a board
-    def get_move(self, board, legal_moves):
+    def get_move(self, board, legal_moves, training):
 
         # Variables that remember best move data
         best_move = -1
@@ -166,7 +166,7 @@ class MonteCarloPlayer(Player):
         self.nr_samples = nr_samples
 
     # Requests a move from the player, given a board
-    def get_move(self, board, legal_moves):
+    def get_move(self, board, legal_moves, training):
 
         # Variables that remember best move data
         best_move = -1
@@ -196,7 +196,8 @@ class MonteCarloPlayer(Player):
         sample_score = game.sample_game(post_board, self, self.nr_samples)
 
         # Train network on score and best choice
-        self.network.train(best_input, sample_score)
+        if (training):
+            self.network.train(best_input, sample_score)
 
         return best_move
 

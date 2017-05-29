@@ -32,12 +32,13 @@ class Game:
         return legal_moves
   
     # Function to play a single game. Player that starts is given as argument
-    def play_game(self):
+    # training is a boolean function
+    def play_game(self, training):
         
         player = self.playerOne
         winner = 0
         while(winner == 0 and self.not_full()):
-            move = player.get_move(self.board.copy(), self.get_legal_moves())
+            move = player.get_move(self.board.copy(), self.get_legal_moves(), training)
             
             winner = self.play_move(move, player.value)
             

@@ -41,15 +41,18 @@ class Network():
     
         # Return the built network
         return network
+
         
     def predict(self, board):
         return self.predict_fn(board)
+
     
     def train(self, board, label):
         loss = self.train_fn(board, label)
         params = lasagne.layers.get_all_param_values(self.network)
         
         return loss #(loss, params)
+
 
     def training_function(self, network, input_tensor, target_tensor, learning_rate):
         
@@ -61,10 +64,11 @@ class Network():
 
         # Get the network parameters and the update function.
         network_params = L.get_all_params(network, trainable=True)
-        weight_updates = lasagne.updates.sgd(loss, network_params, learning_rate)
+        weight_updates = lasagne.updates.sgd(loss, network_params, learning_rate=learning_rate)
     
         # Construct the training function.
         return theano.function([input_tensor, target_tensor], [loss], updates=weight_updates)
+
 
     def evaluate_function(self, network, input_tensor):
     
@@ -73,3 +77,9 @@ class Network():
     
         # Construct the evaluation function.
         return theano.function([input_tensor], network_output)
+
+
+
+
+
+

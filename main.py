@@ -44,7 +44,7 @@ for i in range(epochs):
     # Training cycle
     for _ in tqdm(range(iterations)):
 
-        winner = g.play_game()
+        winner = g.play_game(True)
     
         #printGame(g.board, winner)
         
@@ -66,7 +66,7 @@ for i in range(epochs):
     draws = 0.0
     test_game = Game(p1, p2, board) #Game(p1, Player(2), board)
     for _ in tqdm(range(iterations/10)):
-        winner = test_game.play_game()
+        winner = test_game.play_game(False)
         
         if (winner == p1.value):
             wins += 1.0
