@@ -1,6 +1,5 @@
-- Write a load/save method
+- Write a load/save method !!!!!
+
+
 - training loop (validation vs random?)
 - test loop (two networks -> win-percentage)
-
-- add gaussian noise to all get_moves
-- fix monte-carlo approach
