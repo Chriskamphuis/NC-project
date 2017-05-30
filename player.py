@@ -63,7 +63,7 @@ class EndStatePlayer(Player):
         policy_param = random() 
 
         # If should explore, return random move
-        if (policy_param <= self.explore_rate):
+        if (training and policy_param <= self.explore_rate):
             choice = randint(0, len(legal_moves)-1)
             return legal_moves[choice]
 
@@ -118,7 +118,7 @@ class QLearningPlayer(Player):
         policy_param = random() 
 
         # If should explore, return random move
-        if (policy_param <= self.explore_rate):
+        if (training and policy_param <= self.explore_rate):
             choice = randint(0, len(legal_moves)-1)
             return legal_moves[choice]
 
