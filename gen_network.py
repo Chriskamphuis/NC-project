@@ -2,6 +2,7 @@ import numpy as np
 from keras.layers import Dense, Conv2D, Flatten, Dropout
 from keras.models import Sequential
 
+import player
 
 class Population():
 
@@ -31,8 +32,12 @@ class Population():
         model.add(Dense(1, activation='sigmoid'))
         return model
 
-    def predict(self, board):
-        return [n.predict(board) for n in self.networks]
+    def predict(self, board, noise):
+        prediction = [n.predict(board) for n in self.networks] 
+        if noise:
+            prediction = [pred + np.random.normal(scale=0.01) 
+                          for pred in prediction]
+        return prediction
 
     def copy(self, network):
         weights = network.get_weights()
@@ -72,12 +77,13 @@ class Population():
         fil_from = to_change[:len(to_change)/2]
         fil_to = to_change[len(to_change)/2:]
 
-        # TODO: check if fil_from and fil_to are equal length
+        if len(fil_from) != len(fil_to):
+            raise ValueError('fil from and fil to are not of equal length') 
+        
         for i in range(len(fil_from)):
             self.swap_filters(fil_from[i], fil_to[i])
 
-    def swap_filters(self, filter1, filter2):
-        # TODO: Swap the filters at locations filter1 and filter2
+    def swap_filters(self, filter1, filter2):       
         return
 
     def apply_mutation(self):
@@ -90,10 +96,14 @@ class Population():
                         weights = layer.get_weights()
                         w = weights[0]
                         b = weights[1]
-                        w += np.random.normal(scale=self.mutation, size=w.shape)
-                        b += np.random.normal(scale=self.mutation, size=b.shape)
+                        w += np.random.normal(scale=self.mutation,
+                                              size=w.shape)
+                        b += np.random.normal(scale=self.mutation,
+                                              size=b.shape)
                         layer.set_weights([w, b])
+                        print 'output'
 
 if __name__ == '__main__':
-    p = Population()
-    p.apply_crossover()
+    p = player.GeneticPlayer()
+    p.evolve(2)
+    print p.population.networks[0].layers[0].get_weights()[1]
