@@ -123,23 +123,23 @@ class Game:
         old_playerOne = self.playerOne
         old_playerTwo = self.playerTwo
         
-        # Determine starting random player from given position
-        if (last_player == self.playerOne):
-            self.playerOne = Player(self, self.playerTwo.value, False)
-            self.playerTwo = Player(self, self.playerOne.value, False)
-        else:
-            self.playerOne = Player(self, self.playerOne.value, False)
-            self.playerTwo = Player(self, self.playerTwo.value, False)
-        
         # Play nr_samples random games
         score = 0.0
         for _ in range(nr_samples):
+            
+            # Determine starting random player from given position
+            if (last_player == self.playerOne):
+                self.playerOne = Player(self.playerTwo.value)
+                self.playerTwo = Player(self.playerOne.value)
+            else:
+                self.playerOne = Player(self.playerOne.value)
+                self.playerTwo = Player(self.playerTwo.value) 
         
             # Set input board a start point
             self.board = board
 
             # Play random game
-            winner = self.play_game()
+            winner = self.play_game(False)
     
             # Add to score
             if (winner == last_player.value):
