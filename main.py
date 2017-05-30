@@ -16,19 +16,23 @@ def printGame(board, winner):
         print "\nThe game was a draw. (Boring!)"
 #########
 
-net1 = Network("Endstate1", [3, 6, 7], 0.01)
+net11 = Network("Endstate1", [3, 6, 7], 0.01)
+#net12 = Network("MonteCarlo1", [3, 6, 7], 0.01)
+#net13 = Network("Qlearning1", [3, 6, 7], 0.2)
 
 #p1 = Player(1)
-p1 = EndStatePlayer(1, net1, 0.1)
-#p1 = MonteCarloPlayer(1, net, 10)
-#p1 = QLearningPlayer(1, net1, 0.1, 0.9)
+p1 = EndStatePlayer(1, net11, 0.1)
+#p1 = MonteCarloPlayer(1, net12, 10)
+#p1 = QLearningPlayer(1, net13, 0.1, 0.9)
 
-net2 = Network("Endstate2", [3, 6, 7], 0.2)
+#net21 = Network("Endstate2", [3, 6, 7], 0.01)
+#net22 = Network("MonteCarlo2", [3, 6, 7], 0.01)
+net23 = Network("Qlearning2", [3, 6, 7], 0.2)
 
 #p2 = Player(2)
-#p2 = EndStatePlayer(2, net2, 0.1)
-#p2 = MonteCarloPlayer(2, net, 10)
-p2 = QLearningPlayer(2, net2, 0.25, 0.9)
+#p2 = EndStatePlayer(2, net21, 0.1)
+#p2 = MonteCarloPlayer(2, net22, 10)
+p2 = QLearningPlayer(2, net23, 0.2, 0.9)
 
 #board = np.zeros((6, 7), dtype=np.int8)
 g = Game(p1, p2)#, board)
