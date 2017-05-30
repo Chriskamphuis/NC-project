@@ -19,6 +19,7 @@ class Player():
 
     def __init__(self, value):
         self.value = value
+        self.explore_rate = 0.0
 
     # Translates a board into a three-dimensional input array for the neural nets
     # Here dimension 1 is always empty, 2 own moves, 3 opponents' moves
@@ -195,6 +196,8 @@ class MonteCarloPlayer(Player):
         self.network = network
         self.nr_samples = nr_samples
 
+        self.explore_rate = 0.0
+
     # Requests a move from the player, given a board
     def get_move(self, board, legal_moves, training):
 
@@ -245,6 +248,8 @@ class GeneticPlayer(Player):
         self.population = population
         if self.population is None:
             self.population = gen_network.Population()
+
+        self.explore_rate = 0.0
 
     # Requests a move from the player, given a board.
     def get_move(self, board, legal_moves, training):
