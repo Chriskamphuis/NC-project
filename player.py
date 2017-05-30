@@ -239,7 +239,7 @@ class MonteCarloPlayer(Player):
 class GeneticPlayer(Player):
 
     # Initializes the player.
-    def __init__(self, value, network=None, population=None):
+    def __init__(self, value=1, network=None, population=None):
         self.value = value
         self.network = network
         self.population = population
@@ -262,9 +262,7 @@ class GeneticPlayer(Player):
 
             # Get prediction on post_board
             input_arr = self.board_2_input(board)
-            pred = self.network.predict(input_arr)
-            # Add some gaussian noise to the best board to stimulate variation
-            pred += np.random.normal(scale=0.01)
+            pred = self.network.predict(input_arr, noise=True)
 
             # Update best move and score
             if (best_move == -1 or pred > best_pred):
@@ -286,7 +284,7 @@ class GeneticPlayer(Player):
             p2 = GeneticPlayer(2, network=perm[1])
             for i in range(iterations):
                 g = Game(p1, p2, board)
-                winner = g.play_game()
+                winner = g.play_game(training=True)
                 g.reset_board()
                 if winner < 2:
                     fitness[self.population.networks.index(perm[winner])] += 1

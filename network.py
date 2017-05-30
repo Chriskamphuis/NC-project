@@ -43,8 +43,11 @@ class Network():
         return network
 
         
-    def predict(self, board):
-        return self.predict_fn(board)
+    def predict(self, board, noise):
+        prediction = self.predict_fn(board)
+        if noise:
+            prediction += np.random.normal(scale=0.01)
+        return prediction
 
     
     def train(self, board, label):
