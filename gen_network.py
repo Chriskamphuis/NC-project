@@ -6,7 +6,7 @@ from keras.models import Sequential
 class Population():
 
     def __init__(self, name='genetic player', input_size=(3, 6, 7),
-                 crossover=0.01, mutation=0.01,
+                 crossover=0.01, mutation=0.1,
                  population_size=5, elitism=True):
         # Parameters
         self.name = name
@@ -81,15 +81,18 @@ class Population():
         return
 
     def apply_mutation(self):
-        for network in self.networks:
-            for layer in network.layers:
-                if type(layer) == Conv2D or type(layer) == Dense:
-                    weights = layer.get_weights()
-                    w = weights[0]
-                    b = weights[1]
-                    w += np.random.normal(scale=self.mutation, size=w.shape)
-                    b += np.random.normal(scale=self.mutation, size=b.shape)
-                    layer.set_weights([w, b])
+        for i in range(len(self.networks)):
+            if i == 0 and self.elitsm:
+                continue
+            else:
+                for layer in self.networks[i].layers:
+                    if type(layer) == Conv2D or type(layer) == Dense:
+                        weights = layer.get_weights()
+                        w = weights[0]
+                        b = weights[1]
+                        w += np.random.normal(scale=self.mutation, size=w.shape)
+                        b += np.random.normal(scale=self.mutation, size=b.shape)
+                        layer.set_weights([w, b])
 
 if __name__ == '__main__':
     p = Population()
