@@ -20,23 +20,23 @@ def printGame(board, winner):
     DEFINE PLAYERS AND NETWORKS
 '''
 
-net11 = Network("Endstate1", [3, 6, 7], 0.01)
+#net11 = Network("Endstate1", [3, 6, 7], 0.01)
 #net12 = Network("MonteCarlo1", [3, 6, 7], 0.01)
-#net13 = Network("Qlearning1", [3, 6, 7], 0.2)
+net13 = Network("Qlearning1", [3, 6, 7], 0.05)
 
 #p1 = Player(1)
-p1 = EndStatePlayer(1, net11)
+#p1 = EndStatePlayer(1, net11)
 #p1 = MonteCarloPlayer(1, net12, 10)
-#p1 = QLearningPlayer(1, net13, 0.1, 0.9)
+p1 = QLearningPlayer(1, net13, 0.1, 0.9)
 
-net21 = Network("Endstate2", [3, 6, 7], 0.01)
+#net21 = Network("Endstate2", [3, 6, 7], 0.01)
 #net22 = Network("MonteCarlo2", [3, 6, 7], 0.01)
-#net23 = Network("Qlearning2", [3, 6, 7], 0.2)
+net23 = Network("Qlearning2", [3, 6, 7], 0.05)
 
 #p2 = Player(2)
-p2 = EndStatePlayer(2, net21)
+#p2 = EndStatePlayer(2, net21)
 #p2 = MonteCarloPlayer(2, net22, 10)
-#p2 = QLearningPlayer(2, net23, 0.2, 0.9)
+p2 = QLearningPlayer(2, net23, 0.2, 0.9)
 
 #board = np.zeros((6, 7), dtype=np.int8)
 g = Game(p1, p2)#, board)
@@ -50,10 +50,9 @@ g = Game(p1, p2)#, board)
 start = time.time()
 
 epochs = 20 #25
-tra_iterations = 1000 #1000
-val_iterations = 10
+tra_iterations = 400 #1000
+val_iterations = 100
 
-winners = 0.0
 for i in range(epochs):   
 
     # Adjust exploration chance
@@ -86,7 +85,7 @@ for i in range(epochs):
     wins_p2 = 0.0
     draws = 0.0
     test_game = Game(p1, Player(2))#, board) #Game(p1, Player(2), board)
-    for _ in tqdm(range(val_iterations)):
+    for j in tqdm(range(val_iterations)):
         winner = test_game.play_game(False)
         
         if (winner == p1.value):
@@ -97,8 +96,8 @@ for i in range(epochs):
             
         elif (winner == 0):
             draws += 1.0
-
-        test_game.print_board()
+        if j < 5:
+            test_game.print_board()
         test_game.reset_board()
         test_game.switch_players()
             

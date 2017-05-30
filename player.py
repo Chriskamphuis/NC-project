@@ -229,8 +229,8 @@ class MonteCarloPlayer(Player):
             # Determine Monte Carlo based score
             g = game.Game(Player(1), Player(2), board)
             sample_score = g.sample_game(post_board, self, self.nr_samples)
-            
-            self.network.train(best_input, sample_score)
+             
+            self.network.train(best_input, 1.0 - sample_score)
 
         return best_move
 
