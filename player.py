@@ -226,7 +226,7 @@ class GeneticPlayer(Player):
             self.population = gen_network.Population()
 
     # Requests a move from the player, given a board.
-    def get_move(self, board, legal_moves):
+    def get_move(self, board, legal_moves, training):
         if self.network is None:
             raise ValueError('The player does not know a network yet.')
         best_move = -1
