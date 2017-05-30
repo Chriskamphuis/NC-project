@@ -267,7 +267,7 @@ class GeneticPlayer(Player):
 
             # Get prediction on post_board
             input_arr = self.board_2_input(board)
-            pred = self.network.predict(input_arr, noise=True)
+            pred = self.network.predict(input_arr)
 
             # Update best move and score
             if (best_move == -1 or pred > best_pred):
@@ -288,7 +288,7 @@ class GeneticPlayer(Player):
             p1 = GeneticPlayer(1, network=perm[0])
             p2 = GeneticPlayer(2, network=perm[1])
             for i in range(iterations):
-                g = Game(p1, p2, board)
+                g = game.Game(p1, p2, board)
                 winner = g.play_game(training=True)
                 g.reset_board()
                 if winner < 2:
@@ -296,7 +296,6 @@ class GeneticPlayer(Player):
                 else:
                     fitness[self.population.networks.index(perm[0])] += .5
                     fitness[self.population.networks.index(perm[1])] += .5
-
         self.population.train(fitness)
         self.population.apply_mutation()
 
