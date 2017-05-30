@@ -1,5 +1,5 @@
 from game import *
-from random import randint
+from random import *
 
 from network import *
 import gen_network
@@ -17,7 +17,7 @@ import lasagne.layers as L
 
 class Player():
 
-    def __init__(self, value, sign_in = True):
+    def __init__(self, value):
         self.value = value
 
     # Translates a board into a three-dimensional input array for the neural nets
@@ -51,33 +51,43 @@ class Player():
 
 class EndStatePlayer(Player):
 
-    def __init__(self, value, network):
+    def __init__(self, value, network, explore_rate=0.1):
         self.value = value
         self.network = network
+        self.explore_rate = explore_rate
 
     # Requests a move from the player, given a board
     def get_move(self, board, legal_moves, training):
 
-        best_move = -1
-        best_pred = 0
+        # Choose between exploitation or exploration
+        policy_param = random() 
 
-        for move in legal_moves:
+        # If should explore, return random move
+        if (policy_param <= self.explore_rate):
+            choice = randint(0, len(legal_moves)-1)
+            return legal_moves[choice]
 
-            # Process move on copy of board
-            post_board = board.copy()
-            played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[board.shape[0]-1-played, move] = self.value
+        # Else exploit as usual
+        else:
+            best_move = -1
+            best_pred = 0
 
-            # Get prediction on post_board
-            input_arr = self.board_2_input(post_board)
-            pred = self.network.predict(input_arr)
+            for move in legal_moves:
 
-            if best_move == -1 or pred > best_pred:
-                best_move = move
-                best_pred = pred
+                # Process move on copy of board
+                post_board = board.copy()
+                played = sum([1 for e in post_board[:, move] if e != 0])
+                post_board[board.shape[0]-1-played, move] = self.value
 
-        return best_move
+                # Get prediction on post_board
+                input_arr = self.board_2_input(post_board)
+                pred = self.network.predict(input_arr)
 
+                if best_move == -1 or pred > best_pred:
+                    best_move = move
+                    best_pred = pred
+
+            return best_move
 
     # Function to start the training process
     def tell_outcome(self, board, score):
@@ -85,15 +95,8 @@ class EndStatePlayer(Player):
         # Convert board to input shape
         input_arr = self.board_2_input(board)
 
-        # Train network on board and score
-        #net = self.network.network
-        #pre_pars = L.get_all_param_values(net)
-        
+        # Train network on board and score      
         self.network.train(input_arr, score)
-
-        #post_pars = L.get_all_param_values(net)
-
-        #print (pre_pars[0] - post_pars[0]).all()
 
 #####################
 # Q-LEARNING PLAYER #
@@ -101,40 +104,51 @@ class EndStatePlayer(Player):
 
 class QLearningPlayer(Player):
 
-    def __init__(self, value, network, discount=0.9):
+    def __init__(self, value, network, explore_rate=0.1, discount=0.9):
         self.value = value
         self.network = network
+        self.explore_rate = explore_rate
         self.discount = discount
         self.memory = list()
 
     # Requests a move from the player, given a board
     def get_move(self, board, legal_moves, training):
 
-        # Variables that remember best move data
-        best_move = -1
-        best_pred = 0
-        best_input = None
+        # Choose between exploitation or exploration
+        policy_param = random() 
 
-        for move in legal_moves:
+        # If should explore, return random move
+        if (policy_param <= self.explore_rate):
+            choice = randint(0, len(legal_moves)-1)
+            return legal_moves[choice]
 
-            # Process move on copy of board
-            post_board = board.copy()
-            played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[board.shape[0]-1-played, move] = self.value
+        # Else exploit as usual
+        else:
+            # Variables that remember best move data
+            best_move = -1
+            best_pred = 0
+            best_input = None
 
-            # Get prediction on post_board
-            input_arr = self.board_2_input(board)
-            pred = self.network.predict(input_arr)
+            for move in legal_moves:
 
-            if best_move == -1 or pred > best_pred:
-                best_move = move
-                best_pred = pred
-                best_input = input_arr
+                # Process move on copy of board
+                post_board = board.copy()
+                played = sum([1 for e in post_board[:, move] if e != 0])
+                post_board[board.shape[0]-1-played, move] = self.value
 
-        # Add board to memory
-        self.memory.append(best_input)
+                # Get prediction on post_board
+                input_arr = self.board_2_input(board)
+                pred = self.network.predict(input_arr)
 
-        return best_move
+                if best_move == -1 or pred > best_pred:
+                    best_move = move
+                    best_pred = pred
+                    best_input = input_arr
+
+            # Add board to memory
+            self.memory.append(best_input)
+
+            return best_move
 
 
     # Function to start the training process
