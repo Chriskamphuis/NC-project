@@ -82,7 +82,9 @@ class Population():
 
     def apply_mutation(self):
         for i in range(len(self.networks)):
-            if i > 0:
+            if i == 0 and self.elitsm:
+                continue
+            else:
                 for layer in self.networks[i].layers:
                     if type(layer) == Conv2D or type(layer) == Dense:
                         weights = layer.get_weights()
