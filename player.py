@@ -63,7 +63,7 @@ class EndStatePlayer(Player):
         policy_param = random() 
 
         # If should explore, return random move
-        if (policy_param <= self.explore_rate):
+        if (training and policy_param <= self.explore_rate):
             choice = randint(0, len(legal_moves)-1)
             return legal_moves[choice]
 
@@ -118,9 +118,23 @@ class QLearningPlayer(Player):
         policy_param = random() 
 
         # If should explore, return random move
-        if (policy_param <= self.explore_rate):
+        if (training and policy_param <= self.explore_rate):
+
             choice = randint(0, len(legal_moves)-1)
-            return legal_moves[choice]
+            move = legal_moves[choice]
+
+            # Process move on copy of board
+            post_board = board.copy()
+            played = sum([1 for e in post_board[:, move] if e != 0])
+            post_board[board.shape[0]-1-played, move] = self.value
+
+            # Get prediction on post_board
+            input_arr = self.board_2_input(post_board)
+
+            # Add board to memory
+            self.memory.append(input_arr)
+            
+            return move
 
         # Else exploit as usual
         else:
@@ -137,7 +151,7 @@ class QLearningPlayer(Player):
                 post_board[board.shape[0]-1-played, move] = self.value
 
                 # Get prediction on post_board
-                input_arr = self.board_2_input(board)
+                input_arr = self.board_2_input(post_board)
                 pred = self.network.predict(input_arr)
 
                 if best_move == -1 or pred > best_pred:
@@ -153,13 +167,6 @@ class QLearningPlayer(Player):
 
     # Function to start the training process
     def tell_outcome (self, board, score):
-
-        # Get prediction on post_board
-        input_arr = self.board_2_input(board)
-        pred = self.network.predict(input_arr)
-
-        # Add final state and score to memory
-        self.memory.append(input_arr)
 
         # Train network via Q-learning
         real_util = score - 0.5
