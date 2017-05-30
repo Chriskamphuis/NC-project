@@ -88,8 +88,10 @@ class Population():
 
     def apply_mutation(self):
         for i in range(len(self.networks)):
+            print i
             if i == 0 and self.elitsm:
-                continue
+                print i
+                pass
             else:
                 for layer in self.networks[i].layers:
                     if type(layer) == Conv2D or type(layer) == Dense:
@@ -101,7 +103,6 @@ class Population():
                         b += np.random.normal(scale=self.mutation,
                                               size=b.shape)
                         layer.set_weights([w, b])
-                        print 'output'
 
 if __name__ == '__main__':
     p = player.GeneticPlayer()
