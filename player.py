@@ -237,15 +237,15 @@ class MonteCarloPlayer(Player):
         self.explore_rate = 0.0
 
     # Requests a move from the player, given a board
-    def get_move(self, game, legal_moves, training):
+    def get_move(self, main_game, legal_moves, training):
 
         # Check for win-in-one if allowed
         if (self.win_in_one):
-            move = self.check_win_in_one(game, legal_moves)
+            move = self.check_win_in_one(main_game, legal_moves)
             if (move != -1):
                 return move
 
-        board = game.board.copy()
+        board = main_game.board.copy()
 
         # Variables that remember best move data
         best_move = -1
@@ -276,7 +276,7 @@ class MonteCarloPlayer(Player):
             g = game.Game(Player(1), Player(2), board)
             sample_score = g.sample_game(post_board, self, self.nr_samples)
              
-            self.network.train(best_input, 1.0 - sample_score)
+            self.network.train(best_input, sample_score)
 
         return best_move
 

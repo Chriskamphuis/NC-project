@@ -43,7 +43,7 @@ class Game:
         while(winner == 0 and self.not_full()):
             # Decide legal moves and shuffle them (for variety)
             legal_moves = self.get_legal_moves()
-            random.shuffle(legal_moves)
+            np.random.shuffle(legal_moves)
 
             # Request move from player
             move = player.get_move(self, legal_moves, training)
