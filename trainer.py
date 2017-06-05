@@ -20,23 +20,23 @@ def printGame(board, winner):
     DEFINE PLAYERS AND NETWORKS
 '''
 
-#net11 = Network("Endstate1", [3, 6, 7], 0.01)
-#net12 = Network("MonteCarlo1", [3, 6, 7], 0.01)
-net13 = Network("Qlearning1", [3, 6, 7], 0.05)
+#net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.01)
+net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
+#net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.2)
 
 #p1 = Player(1)
-#p1 = EndStatePlayer(1, net11)
-#p1 = MonteCarloPlayer(1, net12, 10)
-p1 = QLearningPlayer(1, net13, 0.1, 0.9)
+#p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = False)
+p1 = MonteCarloPlayer(1, net12, nr_samples=10, win_in_one = False)
+#p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = False)
 
-#net21 = Network("Endstate2", [3, 6, 7], 0.01)
-#net22 = Network("MonteCarlo2", [3, 6, 7], 0.01)
-net23 = Network("Qlearning2", [3, 6, 7], 0.05)
+#net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.01)
+net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
+#net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.2)
 
 #p2 = Player(2)
-#p2 = EndStatePlayer(2, net21)
-#p2 = MonteCarloPlayer(2, net22, 10)
-p2 = QLearningPlayer(2, net23, 0.2, 0.9)
+#p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = False)
+p2 = MonteCarloPlayer(2, net22, nr_samples=10, win_in_one = True)
+#p2 = QLearningPlayer(2, net23, explore_rate=0.2, discount=0.9, win_in_one = False)
 
 #board = np.zeros((6, 7), dtype=np.int8)
 g = Game(p1, p2)#, board)
@@ -53,7 +53,14 @@ epochs = 20 #25
 tra_iterations = 400 #1000
 val_iterations = 100
 
-for i in range(epochs):   
+for i in range(epochs):
+
+    # Parameters to evaluate both training and validation
+    wins_p1 = 0.0
+    wins_p2 = 0.0
+    draws = 0.0
+    avg_moves_train = 0.0
+    avg_moves_val = 0.0
 
     # Adjust exploration chance
     explore_rate = max(0.1, 1.0-(0.1*i))
@@ -63,7 +70,8 @@ for i in range(epochs):
     # Training cycle
     for _ in tqdm(range(tra_iterations)):
 
-        winner = g.play_game(True)
+        (winner, moves) = g.play_game(True)
+        avg_moves_train += moves
     
         #printGame(g.board, winner)
         
@@ -81,12 +89,10 @@ for i in range(epochs):
         g.switch_players()
         
     # Validation cycle
-    wins_p1 = 0.0
-    wins_p2 = 0.0
-    draws = 0.0
     test_game = Game(p1, Player(2))#, board) #Game(p1, Player(2), board)
     for j in tqdm(range(val_iterations)):
-        winner = test_game.play_game(False)
+        (winner, moves) = test_game.play_game(False)
+        avg_moves_val += moves
         
         if (winner == p1.value):
             wins_p1 += 1.0
@@ -102,6 +108,8 @@ for i in range(epochs):
         test_game.switch_players()
             
     print "Epoch {0}:".format(i+1)
+    print "Average moves/game during training: {0}".format(avg_moves_train/tra_iterations)
+    print "Average moves/game during validation: {0}".format(avg_moves_val/val_iterations)
     print "Win percentage P1: {0}".format(wins_p1/(val_iterations))
     print "Win percentage P2: {0}".format(wins_p2/(val_iterations))
     print "Draw percentage: {0}".format(draws/(val_iterations))
