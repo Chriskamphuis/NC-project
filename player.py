@@ -38,9 +38,28 @@ class Player():
 
 
     # Get a move (standard random move)
-    def get_move(self, board, legal_moves, training):
+    def get_move(self, game, legal_moves, training):
+
+        move = self.check_win_in_one(game, legal_moves)
+        if (move != -1):
+            return move
+
         choice = randint(0, len(legal_moves)-1)
         return legal_moves[choice]
+
+    # Check if there is a win in 1 move and returns it
+    # Returns -1 if there is no such move
+    def check_win_in_one(self, game, legal_moves):    
+        # Check if any move is winning
+        board = game.board.copy()
+        for move in legal_moves:
+            winner = game.play_move(move, self.value)
+            game.board = board.copy()
+
+            # If it is, play it            
+            if (winner == self.value):
+                return move
+        return -1
 
     def tell_outcome(self, board, score):
         return ""
@@ -52,13 +71,22 @@ class Player():
 
 class EndStatePlayer(Player):
 
-    def __init__(self, value, network, explore_rate=0.1):
+    def __init__(self, value, network, explore_rate=0.1, win_in_one=True):
         self.value = value
         self.network = network
         self.explore_rate = explore_rate
+        self.win_in_one = win_in_one
 
     # Requests a move from the player, given a board
-    def get_move(self, board, legal_moves, training):
+    def get_move(self, game, legal_moves, training):
+
+        # Check for win-in-one if allowed
+        if (self.win_in_one):
+            move = self.check_win_in_one(game, legal_moves)
+            if (move != -1):
+                return move
+
+        board = game.board.copy()
 
         # Choose between exploitation or exploration
         policy_param = random() 
@@ -105,15 +133,24 @@ class EndStatePlayer(Player):
 
 class QLearningPlayer(Player):
 
-    def __init__(self, value, network, explore_rate=0.1, discount=0.9):
+    def __init__(self, value, network, explore_rate=0.1, discount=0.9, win_in_one=True):
         self.value = value
         self.network = network
         self.explore_rate = explore_rate
         self.discount = discount
         self.memory = list()
+        self.win_in_one = win_in_one
 
     # Requests a move from the player, given a board
-    def get_move(self, board, legal_moves, training):
+    def get_move(self, game, legal_moves, training):
+
+        # Check for win-in-one if allowed
+        if (self.win_in_one):
+            move = self.check_win_in_one(game, legal_moves)
+            if (move != -1):
+                return move
+
+        board = game.board.copy()
 
         # Choose between exploitation or exploration
         policy_param = random() 
@@ -191,15 +228,24 @@ class QLearningPlayer(Player):
 
 class MonteCarloPlayer(Player):
 
-    def __init__(self, value, network, nr_samples):
+    def __init__(self, value, network, nr_samples=10, win_in_one=True):
         self.value = value
         self.network = network
         self.nr_samples = nr_samples
+        self.win_in_one = win_in_one
 
         self.explore_rate = 0.0
 
     # Requests a move from the player, given a board
-    def get_move(self, board, legal_moves, training):
+    def get_move(self, game, legal_moves, training):
+
+        # Check for win-in-one if allowed
+        if (self.win_in_one):
+            move = self.check_win_in_one(game, legal_moves)
+            if (move != -1):
+                return move
+
+        board = game.board.copy()
 
         # Variables that remember best move data
         best_move = -1

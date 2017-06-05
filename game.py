@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 from player import *
 
@@ -37,8 +38,15 @@ class Game:
         
         player = self.playerOne
         winner = 0
+        moves = 0
+
         while(winner == 0 and self.not_full()):
-            move = player.get_move(self.board.copy(), self.get_legal_moves(), training)
+            # Decide legal moves and shuffle them (for variety)
+            legal_moves = self.get_legal_moves()
+            random.shuffle(legal_moves)
+
+            # Request move from player
+            move = player.get_move(self, legal_moves, training)
             
             winner = self.play_move(move, player.value)
 
@@ -49,7 +57,10 @@ class Game:
                 player = self.playerTwo
             else:
                 player = self.playerOne
-        return winner
+
+            moves += 1
+
+        return (winner, moves)
         
     # Check if the board is full, for draws
     def not_full(self):
