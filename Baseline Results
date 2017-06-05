@@ -1,0 +1,35 @@
+Endstate network:
+
+    Learning rate   = 0.01
+    Win-in=1        = False/False
+    
+    epochs          = 20
+    iter_tra        = 1000
+    iter_val        = 100
+
+    Best-winrate    = 0.71
+
+
+Endstate network:
+
+    Learning rate   = 0.01
+    Win-in=1        = True/True
+    
+    epochs          = 20
+    iter_tra        = 1000
+    iter_val        = 100
+
+    Best-winrate    = 0.84
+
+
+
+Endstate network:
+
+    Learning rate   = 0.01
+    Win-in=1        = False/True
+    
+    epochs          = 20
+    iter_tra        = 1000
+    iter_val        = 100
+
+    Best-winrate    = 0.73
