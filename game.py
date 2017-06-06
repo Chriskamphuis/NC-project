@@ -135,7 +135,6 @@ class Game:
         old_playerOne = self.playerOne
         old_playerTwo = self.playerTwo
 
-
         # Determine starting random player from given position        
         val_one = self.playerOne.value
         val_two = self.playerTwo.value
@@ -156,8 +155,6 @@ class Game:
 
             # Play random game
             winner = self.play_game(False)
-            
-            print (i+1), winner[0], last_player.value
 
             # Player who played last move before sampling won
             if (winner[0] == last_player.value): 
@@ -170,8 +167,6 @@ class Game:
             # Player who did not play last move before sampling won        
             else:
                 score += 0.0
-
-            print self.board 
             
         # Place original settings back
         self.board = current_board

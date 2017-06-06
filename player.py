@@ -302,16 +302,14 @@ class MonteCarloPlayer(Player):
                 best_move = move
                 best_pred = pred
                 best_input = input_arr
-                best_board = post_board #######
+                best_board = post_board
 
         # Train network on score and best choice
         if (training):
             
             # Determine Monte Carlo based score
             g = game.Game(Player(1), Player(2), board)
-            sample_score = g.sample_game(best_board, self, self.nr_samples) ###
-            #sample_score = g.sample_game(post_board, self, self.nr_samples)
-             
+            sample_score = g.sample_game(best_board, self, self.nr_samples)
             self.network.train(best_input, sample_score)
 
         return best_move
