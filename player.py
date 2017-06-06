@@ -279,30 +279,45 @@ class MonteCarloPlayer(Player):
                 return move
 
         board = main_game.board.copy()
-
+        
+        
         # Variables that remember best move data
         best_move = -1
         best_pred = 0
-        best_input = None
         best_board = None
+        
+        # Choose between exploitation or exploration
+        policy_param = random() 
 
-        for move in legal_moves:
-
+        # If should explore, return random move
+        if (training and policy_param <= self.explore_rate):
+            choice = randint(0, len(legal_moves)-1)
+            best_move = choice
+            
             # Process move on copy of board
-            post_board = board.copy()
-            played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[board.shape[0]-1-played, move] = self.value
+            best_board = board.copy()
+            played = sum([1 for e in post_board[:, best_move] if e != 0])
+            best_board[board.shape[0]-1-played, best_move] = self.value
+            
 
-            # Get prediction on post_board
-            input_arr = self.board_2_input(board)
-            pred = self.network.predict(input_arr)
+        # Else exploit as usual
+        else:
+            for move in legal_moves:
 
-            # Update best move and score
-            if (best_move == -1 or pred > best_pred):
-                best_move = move
-                best_pred = pred
-                best_input = input_arr
-                best_board = post_board #######
+                # Process move on copy of board
+                post_board = board.copy()
+                played = sum([1 for e in post_board[:, move] if e != 0])
+                post_board[board.shape[0]-1-played, move] = self.value
+
+                # Get prediction on post_board
+                input_arr = self.board_2_input(board)
+                pred = self.network.predict(input_arr)
+
+                # Update best move and score
+                if (best_move == -1 or pred > best_pred):
+                    best_move = move
+                    best_pred = pred
+                    best_board = post_board #######
 
         # Train network on score and best choice
         if (training):
