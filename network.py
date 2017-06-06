@@ -24,7 +24,7 @@ class Network():
         self.train_fn = self.training_function(self.network, self.input_tensor, self.target_tensor, learning_rate)
         self.predict_fn = self.evaluate_function(self.network, self.input_tensor)
 
-                                               
+    # Construct the network                                           
     def build_network(self, input_size):
 
         # Input layer
@@ -44,20 +44,20 @@ class Network():
         # Return the built network
         return network
 
-        
+    # Predict evaluation score from board    
     def predict(self, board):
         prediction = self.predict_fn(board)
         prediction += np.random.normal(scale=0.01)
         return prediction
 
-    
+    # Train network on board and label (which can be loss, draw or win)
     def train(self, board, label):
         loss = self.train_fn(board, label)
         params = lasagne.layers.get_all_param_values(self.network)
         
         return loss #(loss, params)
 
-
+    # Lasagne training function
     def training_function(self, network, input_tensor, target_tensor, learning_rate):
         
         # Get the network output and calculate loss.
@@ -73,7 +73,7 @@ class Network():
         # Construct the training function.
         return theano.function([input_tensor, target_tensor], [loss], updates=weight_updates)
 
-
+    # Lassagne evaluation function
     def evaluate_function(self, network, input_tensor):
     
         # Get the network output and calculate metrics.
@@ -81,3 +81,28 @@ class Network():
     
         # Construct the evaluation function.
         return theano.function([input_tensor], network_output)
+
+    # Save network
+    def save_network(self, winrate, epoch):
+
+        params = L.get_all_param_values(self.network)
+        np.savez(os.path.join('../Networks/', self.name + '_' + str(self.learning_rate) + '_' + str(winrate) + '_' + str(i) + '.npz'), params=params)
+        
+    # Load existing network
+    def load_network(self, saved_name):
+
+        npz = np.load('../Networks/' + saved_name + '.npz') # load stored parameters
+        L.set_all_param_values(self.network, npz['params']) # set parameters
+
+    # Save params
+    def get_params(self):
+
+        # Load current params and return them
+        return L.get_all_param_values(self.network)
+
+    # Load params
+    def set_params(self, params):
+
+        # Set given params in current network
+        L.set_all_param_values(self.network, params)
+        

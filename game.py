@@ -118,9 +118,10 @@ class Game:
         self.board = np.zeros((6, 7), dtype=np.int8)
 
     # Function to print current board
-    def print_board(self):
+    def print_board(self, winner):
         print("printing board")
         print(self.board)
+        print("Player {0} won!".format(winner))
       
       
     ###########################################################################  

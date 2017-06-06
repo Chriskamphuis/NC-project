@@ -14,12 +14,12 @@ import lasagne.layers as L
 # RANDOM PLAYER #
 #################
 
-
 class Player():
 
     def __init__(self, value):
         self.value = value
         self.explore_rate = 0.0
+        self.network = None
 
     # Translates a board into a three-dimensional input array for the neural nets
     # Here dimension 1 is always empty, 2 own moves, 3 opponents' moves
@@ -61,10 +61,31 @@ class Player():
                 return move
         return -1
 
+    # Function to start the training process (not applicable for random player)
     def tell_outcome(self, board, score):
         return ""
 
+    # Save network
+    def save_network(self, winrate, epoch):
+        
+        self.network.save_network(winrate, epoch)
 
+    # Load network from existing file
+    def load_network(self, saved_name):
+
+        self.network.load_network(saved_name)
+
+    # Save params from current network
+    def get_params(self):
+
+        return self.network.get_params()
+
+    # Load params in current network
+    def set_params(self, params):
+
+        self.network.set_params(params)
+
+        
 ####################
 # END STATE PLAYER #
 ####################

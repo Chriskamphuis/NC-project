@@ -6,16 +6,6 @@ from tqdm import tqdm
 import numpy as np
 import time
 
-##########
-def printGame(board, winner):
-    print board
-    if (winner != 0):
-        print "\nPlayer {0} won!".format(winner)
-        
-    else:
-        print "\nThe game was a draw. (Boring!)"
-#########
-
 '''
     DEFINE PLAYERS AND NETWORKS
 '''
@@ -26,7 +16,7 @@ net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
 
 #p1 = Player(1)
 #p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = False)
-p1 = MonteCarloPlayer(1, net12, nr_samples=1000, win_in_one = True)
+p1 = MonteCarloPlayer(1, net12, nr_samples=10, win_in_one = True)
 #p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
 
 #net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.2)
@@ -35,7 +25,7 @@ net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
 
 #p2 = Player(2)
 #p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = False)
-p2 = MonteCarloPlayer(2, net22, nr_samples=1000, win_in_one = True)
+p2 = MonteCarloPlayer(2, net22, nr_samples=10, win_in_one = True)
 #p2 = QLearningPlayer(2, net23, explore_rate=0.1, discount=0.9, win_in_one = True)
 
 #board = np.zeros((6, 7), dtype=np.int8)
@@ -46,13 +36,14 @@ g = Game(p1, p2)#, board)
     MAIN TRAINING LOOP
 '''
 
-
 start = time.time()
 
 epochs = 20 #25
 tra_iterations = 1000 #1000
 val_iterations = 100
 best_winrate = 0
+best_epoch = 0
+best_params = None
 
 for i in range(epochs):
 
@@ -104,7 +95,7 @@ for i in range(epochs):
         elif (winner == 0):
             draws += 1.0
         if j < 5:
-            test_game.print_board()
+            test_game.print_board(winner)
         test_game.reset_board()
         test_game.switch_players()
             
@@ -117,7 +108,12 @@ for i in range(epochs):
 
     if(wins_p1/(val_iterations) > best_winrate):
         best_winrate = wins_p1/(val_iterations)
+        best_epoch = i
+        best_params = p1.get_params()
     
-print "Done! Best winrate is: {0}".format(best_winrate)
+print "Done! Best winrate is {0}% in epoch {1}".format(best_winrate, best_epoch)
 print str(time.time() - start) + " seconds"
 
+print "Saving best network..."
+p1.set_params(best_params)
+p1.save_network(best_winrate, best_epoch)
