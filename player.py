@@ -16,10 +16,11 @@ import lasagne.layers as L
 
 class Player():
 
-    def __init__(self, value):
+    def __init__(self, value, win_in_one = True):
         self.value = value
         self.explore_rate = 0.0
         self.network = None
+        self.win_in_one = win_in_one
 
     # Translates a board into a three-dimensional input array for the neural nets
     # Here dimension 1 is always empty, 2 own moves, 3 opponents' moves
@@ -40,9 +41,10 @@ class Player():
     # Get a move (standard random move)
     def get_move(self, game, legal_moves, training):
 
-        move = self.check_win_in_one(game, legal_moves)
-        if (move != -1):
-            return move
+        if (self.win_in_one):
+            move = self.check_win_in_one(game, legal_moves)
+            if (move != -1):
+                return move
 
         choice = randint(0, len(legal_moves)-1)
         return legal_moves[choice]
