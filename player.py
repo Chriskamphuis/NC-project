@@ -144,13 +144,25 @@ class QLearningPlayer(Player):
     # Requests a move from the player, given a board
     def get_move(self, game, legal_moves, training):
 
+        board = game.board.copy()
+        
         # Check for win-in-one if allowed
         if (self.win_in_one):
             move = self.check_win_in_one(game, legal_moves)
             if (move != -1):
-                return move
+                
+                # Process move on copy of board
+                post_board = board.copy()
+                played = sum([1 for e in post_board[:, move] if e != 0])
+                post_board[board.shape[0]-1-played, move] = self.value
 
-        board = game.board.copy()
+                # Get prediction on post_board
+                input_arr = self.board_2_input(post_board)
+
+                # Add board to memory
+                self.memory.append(input_arr)
+                
+                return move
 
         # Choose between exploitation or exploration
         policy_param = random() 
@@ -251,6 +263,7 @@ class MonteCarloPlayer(Player):
         best_move = -1
         best_pred = 0
         best_input = None
+        best_board = None
 
         for move in legal_moves:
 
@@ -268,13 +281,15 @@ class MonteCarloPlayer(Player):
                 best_move = move
                 best_pred = pred
                 best_input = input_arr
+                best_board = post_board #######
 
         # Train network on score and best choice
         if (training):
             
             # Determine Monte Carlo based score
             g = game.Game(Player(1), Player(2), board)
-            sample_score = g.sample_game(post_board, self, self.nr_samples)
+            sample_score = g.sample_game(best_board, self, self.nr_samples) ###
+            #sample_score = g.sample_game(post_board, self, self.nr_samples)
              
             self.network.train(best_input, sample_score)
 

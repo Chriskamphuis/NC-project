@@ -20,23 +20,23 @@ def printGame(board, winner):
     DEFINE PLAYERS AND NETWORKS
 '''
 
-#net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.01)
+#net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.2)
 net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
-#net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.2)
+#net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.1)
 
 #p1 = Player(1)
 #p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = False)
-p1 = MonteCarloPlayer(1, net12, nr_samples=10, win_in_one = False)
-#p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = False)
+p1 = MonteCarloPlayer(1, net12, nr_samples=1000, win_in_one = True)
+#p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
 
-#net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.01)
+#net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.2)
 net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
-#net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.2)
+#net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.1)
 
 #p2 = Player(2)
 #p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = False)
-p2 = MonteCarloPlayer(2, net22, nr_samples=10, win_in_one = True)
-#p2 = QLearningPlayer(2, net23, explore_rate=0.2, discount=0.9, win_in_one = False)
+p2 = MonteCarloPlayer(2, net22, nr_samples=1000, win_in_one = True)
+#p2 = QLearningPlayer(2, net23, explore_rate=0.1, discount=0.9, win_in_one = True)
 
 #board = np.zeros((6, 7), dtype=np.int8)
 g = Game(p1, p2)#, board)
@@ -50,8 +50,9 @@ g = Game(p1, p2)#, board)
 start = time.time()
 
 epochs = 20 #25
-tra_iterations = 400 #1000
+tra_iterations = 1000 #1000
 val_iterations = 100
+best_winrate = 0
 
 for i in range(epochs):
 
@@ -114,7 +115,9 @@ for i in range(epochs):
     print "Win percentage P2: {0}".format(wins_p2/(val_iterations))
     print "Draw percentage: {0}".format(draws/(val_iterations))
 
+    if(wins_p1/(val_iterations) > best_winrate):
+        best_winrate = wins_p1/(val_iterations)
     
-print "Done!"
+print "Done! Best winrate is: {0}".format(best_winrate)
 print str(time.time() - start) + " seconds"
 

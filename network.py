@@ -11,6 +11,7 @@ from theano import tensor as T
 class Network():
 
     def __init__(self, name, input_size, learning_rate):
+        
         self.name = name
         self.learning_rate = learning_rate
         
@@ -22,6 +23,7 @@ class Network():
         self.network = self.build_network(input_size)
         self.train_fn = self.training_function(self.network, self.input_tensor, self.target_tensor, learning_rate)
         self.predict_fn = self.evaluate_function(self.network, self.input_tensor)
+
                                                
     def build_network(self, input_size):
 
@@ -79,9 +81,3 @@ class Network():
     
         # Construct the evaluation function.
         return theano.function([input_tensor], network_output)
-
-
-
-
-
-
