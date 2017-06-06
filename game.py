@@ -131,35 +131,47 @@ class Game:
     def sample_game(self, board, last_player, nr_samples):
     
         # Save current board to memory
-        current_board = self.board
+        current_board = self.board.copy()
         old_playerOne = self.playerOne
         old_playerTwo = self.playerTwo
-        
+
+
+        # Determine starting random player from given position        
+        val_one = self.playerOne.value
+        val_two = self.playerTwo.value
+
+        if (last_player == self.playerOne):
+            self.playerOne = Player(val_two)
+            self.playerTwo = Player(val_one)
+        else:
+            self.playerOne = Player(val_one)
+            self.playerTwo = Player(val_two) 
+
         # Play nr_samples random games
         score = 0.0
-        for _ in range(nr_samples):
-            
-            # Determine starting random player from given position
-            if (last_player == self.playerOne):
-                self.playerOne = Player(self.playerTwo.value)
-                self.playerTwo = Player(self.playerOne.value)
-            else:
-                self.playerOne = Player(self.playerOne.value)
-                self.playerTwo = Player(self.playerTwo.value) 
+        for i in range(nr_samples):
         
             # Set input board a start point
-            self.board = board
+            self.board = board.copy()
 
             # Play random game
             winner = self.play_game(False)
-    
-            # Add to score
-            if (winner == last_player.value):
+            
+            print (i+1), winner[0], last_player.value
+
+            # Player who played last move before sampling won
+            if (winner[0] == last_player.value): 
                 score += 1.0
-            elif (winner == 0):
-                score += 0.5        
+
+            # Game was a draw
+            elif (winner[0] == 0):
+                score += 0.5
+
+            # Player who did not play last move before sampling won        
             else:
                 score += 0.0
+
+            print self.board 
             
         # Place original settings back
         self.board = current_board
