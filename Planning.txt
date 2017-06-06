@@ -1,9 +1,5 @@
 TODO
 
-- Write a load/save method !!!!!
-
-
-- training loop (validation vs random?)
 - test loop (two networks -> win-percentage)
 
 
@@ -15,3 +11,7 @@ DONE:
 
 - Random: play win-in-1 with 100% chance
 - Make above optional for neural players
+
+- training loop (validation vs random)
+- Write a load/save method
+

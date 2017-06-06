@@ -167,7 +167,7 @@ class Game:
             # Player who did not play last move before sampling won        
             else:
                 score += 0.0
-            
+
         # Place original settings back
         self.board = current_board
         self.playerOne = old_playerOne

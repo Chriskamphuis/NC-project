@@ -10,16 +10,19 @@ from tqdm import tqdm
 
 import lasagne.layers as L
 
+from time import time
+
 #################
 # RANDOM PLAYER #
 #################
 
 class Player():
 
-    def __init__(self, value):
+    def __init__(self, value, win_in_one = True):
         self.value = value
         self.explore_rate = 0.0
         self.network = None
+        self.win_in_one = win_in_one
 
     # Translates a board into a three-dimensional input array for the neural nets
     # Here dimension 1 is always empty, 2 own moves, 3 opponents' moves
@@ -40,9 +43,10 @@ class Player():
     # Get a move (standard random move)
     def get_move(self, game, legal_moves, training):
 
-        move = self.check_win_in_one(game, legal_moves)
-        if (move != -1):
-            return move
+        if (self.win_in_one):
+            move = self.check_win_in_one(game, legal_moves)
+            if (move != -1):
+                return move
 
         choice = randint(0, len(legal_moves)-1)
         return legal_moves[choice]
@@ -279,30 +283,43 @@ class MonteCarloPlayer(Player):
                 return move
 
         board = main_game.board.copy()
-
+          
         # Variables that remember best move data
         best_move = -1
         best_pred = 0
-        best_input = None
         best_board = None
+        
+        # Choose between exploitation or exploration
+        policy_param = random() 
 
-        for move in legal_moves:
-
+        # If should explore, return random move
+        if (training and policy_param <= self.explore_rate):
+            choice = randint(0, len(legal_moves)-1)
+            best_move = choice
+            
             # Process move on copy of board
-            post_board = board.copy()
-            played = sum([1 for e in post_board[:, move] if e != 0])
-            post_board[board.shape[0]-1-played, move] = self.value
+            best_board = board.copy()
+            played = sum([1 for e in post_board[:, best_move] if e != 0])
+            best_board[board.shape[0]-1-played, best_move] = self.value
+            
+        # Else exploit as usual
+        else:
+            for move in legal_moves:
 
-            # Get prediction on post_board
-            input_arr = self.board_2_input(board)
-            pred = self.network.predict(input_arr)
+                # Process move on copy of board
+                post_board = board.copy()
+                played = sum([1 for e in post_board[:, move] if e != 0])
+                post_board[board.shape[0]-1-played, move] = self.value
 
-            # Update best move and score
-            if (best_move == -1 or pred > best_pred):
-                best_move = move
-                best_pred = pred
-                best_input = input_arr
-                best_board = post_board
+                # Get prediction on post_board
+                input_arr = self.board_2_input(board)
+                pred = self.network.predict(input_arr)
+
+                # Update best move and score
+                if (best_move == -1 or pred > best_pred):
+                    best_move = move
+                    best_pred = pred
+                    best_board = post_board
 
         # Train network on score and best choice
         if (training):
@@ -322,22 +339,24 @@ class MonteCarloPlayer(Player):
 class GeneticPlayer(Player):
 
     # Initializes the player.
-    def __init__(self, value=1, network=None, population=None):
+    def __init__(self, value=1, network=None, population=None, psize=5):
         self.value = value
         self.network = network
         self.population = population
         if self.population is None:
-            self.population = gen_network.Population()
+            self.population = gen_network.Population(population_size=psize)
 
         self.explore_rate = 0.0
 
     # Requests a move from the player, given a board.
-    def get_move(self, board, legal_moves, training):
+    def get_move(self, main_game, legal_moves, training):
         if self.network is None:
             raise ValueError('The player does not know a network yet.')
         best_move = -1
         best_pred = 0
-
+        
+        board = main_game.board.copy()
+    
         for move in legal_moves:
 
             # Process move on copy of board
@@ -365,11 +384,13 @@ class GeneticPlayer(Player):
         fitness = [0 for _ in range(len(self.population.networks))]
         board = np.zeros((6, 7), dtype=np.int8)
         for perm in tqdm(permutations(self.population.networks, 2)):
-            p1 = GeneticPlayer(1, network=perm[0])
-            p2 = GeneticPlayer(2, network=perm[1])
+            a = time()
+            p1 = GeneticPlayer(1, network=perm[0], population=[])
+            p2 = GeneticPlayer(2, network=perm[1], population=[])
             for i in range(iterations):
                 g = game.Game(p1, p2, board)
-                winner = g.play_game(training=True)
+                a = time()
+                winner, moves = g.play_game(training=True)
                 g.reset_board()
                 if winner < 2:
                     fitness[self.population.networks.index(perm[winner])] += 1
@@ -378,7 +399,4 @@ class GeneticPlayer(Player):
                     fitness[self.population.networks.index(perm[1])] += .5
         self.population.train(fitness)
         self.population.apply_mutation()
-
-    def give_outcome(self):
-        pass
-
+        self.network = self.population.networks[0]
