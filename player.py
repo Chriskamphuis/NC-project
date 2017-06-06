@@ -10,6 +10,8 @@ from tqdm import tqdm
 
 import lasagne.layers as L
 
+from time import time
+
 #################
 # RANDOM PLAYER #
 #################
@@ -303,22 +305,24 @@ class MonteCarloPlayer(Player):
 class GeneticPlayer(Player):
 
     # Initializes the player.
-    def __init__(self, value=1, network=None, population=None):
+    def __init__(self, value=1, network=None, population=None, psize=5):
         self.value = value
         self.network = network
         self.population = population
         if self.population is None:
-            self.population = gen_network.Population()
+            self.population = gen_network.Population(population_size=psize)
 
         self.explore_rate = 0.0
 
     # Requests a move from the player, given a board.
-    def get_move(self, board, legal_moves, training):
+    def get_move(self, main_game, legal_moves, training):
         if self.network is None:
             raise ValueError('The player does not know a network yet.')
         best_move = -1
         best_pred = 0
-
+        
+        board = main_game.board.copy()
+    
         for move in legal_moves:
 
             # Process move on copy of board
@@ -346,11 +350,13 @@ class GeneticPlayer(Player):
         fitness = [0 for _ in range(len(self.population.networks))]
         board = np.zeros((6, 7), dtype=np.int8)
         for perm in tqdm(permutations(self.population.networks, 2)):
-            p1 = GeneticPlayer(1, network=perm[0])
-            p2 = GeneticPlayer(2, network=perm[1])
+            a = time()
+            p1 = GeneticPlayer(1, network=perm[0], population=[])
+            p2 = GeneticPlayer(2, network=perm[1], population=[])
             for i in range(iterations):
                 g = game.Game(p1, p2, board)
-                winner = g.play_game(training=True)
+                a = time()
+                winner, moves = g.play_game(training=True)
                 g.reset_board()
                 if winner < 2:
                     fitness[self.population.networks.index(perm[winner])] += 1
@@ -359,7 +365,4 @@ class GeneticPlayer(Player):
                     fitness[self.population.networks.index(perm[1])] += .5
         self.population.train(fitness)
         self.population.apply_mutation()
-
-    def give_outcome(self):
-        pass
-
+        self.network = self.population.networks[0]

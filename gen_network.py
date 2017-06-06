@@ -1,8 +1,10 @@
 import numpy as np
 from keras.layers import Dense, Conv2D, Flatten, Dropout
 from keras.models import Sequential
-
+from tqdm import tqdm
 import player
+from game import Game
+
 
 class Population():
 
@@ -32,10 +34,10 @@ class Population():
         model.add(Dense(1, activation='sigmoid'))
         return model
 
-    def predict(self, board, noise):
-        prediction = [n.predict(board) for n in self.networks] 
+    def predict(self, board, noise=True):
+        prediction = [n.predict(board) for n in self.networks]
         if noise:
-            prediction = [pred + np.random.normal(scale=0.01) 
+            prediction = [pred + np.random.normal(scale=0.01)
                           for pred in prediction]
         return prediction
 
@@ -78,19 +80,17 @@ class Population():
         fil_to = to_change[len(to_change)/2:]
 
         if len(fil_from) != len(fil_to):
-            raise ValueError('fil from and fil to are not of equal length') 
-        
+            raise ValueError('fil from and fil to are not of equal length')
+
         for i in range(len(fil_from)):
             self.swap_filters(fil_from[i], fil_to[i])
 
-    def swap_filters(self, filter1, filter2):       
+    def swap_filters(self, filter1, filter2):
         return
 
     def apply_mutation(self):
         for i in range(len(self.networks)):
-            print i
             if i == 0 and self.elitsm:
-                print i
                 pass
             else:
                 for layer in self.networks[i].layers:
@@ -105,6 +105,36 @@ class Population():
                         layer.set_weights([w, b])
 
 if __name__ == '__main__':
-    p = player.GeneticPlayer()
-    p.evolve(2)
-    print p.population.networks[0].layers[0].get_weights()[1]
+    p = player.GeneticPlayer(psize=5)
+    generations = 15
+    val_iterations = 100
+    
+    wins_p1 = 0.0
+    wins_p2 = 0.0
+    avg_moves_val = 0.0
+    draws = 0.0
+
+    for _ in tqdm(range(generations)):
+        p.evolve(2)
+    
+    p1 = p
+    p2 = player.Player(2)
+    test_game = Game(p1, p2)
+
+    for j in tqdm(range(val_iterations)):                                       
+        (winner, moves) = test_game.play_game(False)
+        avg_moves_val += moves
+        if (winner == p1.value):                                                
+            wins_p1 += 1.0
+        if (winner == p2.value):                                                
+            wins_p2 += 1.0
+        elif (winner == 0):                                                     
+            draws += 1.0
+        if j < 5:                                                               
+            test_game.print_board()
+        test_game.reset_board()                                                 
+        test_game.switch_players()
+    print "Average moves/game during validation:{0}".format(avg_moves_val/val_iterations)
+    print "Win percentage P1:{0}".format(wins_p1/(val_iterations))             
+    print "Win percentage P2:{0}".format(wins_p2/(val_iterations))             
+    print "Draw percentage:{0}".format(draws/(val_iterations)) 

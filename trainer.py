@@ -26,7 +26,7 @@ net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
 
 #p1 = Player(1)
 #p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = False)
-p1 = MonteCarloPlayer(1, net12, nr_samples=1000, win_in_one = True)
+p1 = MonteCarloPlayer(1, net12, nr_samples=10, win_in_one = True)
 #p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
 
 #net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.2)
@@ -35,7 +35,7 @@ net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
 
 #p2 = Player(2)
 #p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = False)
-p2 = MonteCarloPlayer(2, net22, nr_samples=1000, win_in_one = True)
+p2 = MonteCarloPlayer(2, net22, nr_samples=10, win_in_one = True)
 #p2 = QLearningPlayer(2, net23, explore_rate=0.1, discount=0.9, win_in_one = True)
 
 #board = np.zeros((6, 7), dtype=np.int8)
@@ -50,8 +50,8 @@ g = Game(p1, p2)#, board)
 start = time.time()
 
 epochs = 20 #25
-tra_iterations = 1000 #1000
-val_iterations = 100
+tra_iterations = 10 #1000
+val_iterations = 10
 best_winrate = 0
 
 for i in range(epochs):
@@ -91,6 +91,12 @@ for i in range(epochs):
         
     # Validation cycle
     test_game = Game(p1, Player(2))#, board) #Game(p1, Player(2), board)
+    
+    avg_moves_val = 0.0
+    wins_p1 = 0.0
+    wins_p2 = 0.0
+    draws = 0.0
+
     for j in tqdm(range(val_iterations)):
         (winner, moves) = test_game.play_game(False)
         avg_moves_val += moves
@@ -103,13 +109,10 @@ for i in range(epochs):
             
         elif (winner == 0):
             draws += 1.0
-        if j < 5:
-            test_game.print_board()
         test_game.reset_board()
         test_game.switch_players()
             
     print "Epoch {0}:".format(i+1)
-    print "Average moves/game during training: {0}".format(avg_moves_train/tra_iterations)
     print "Average moves/game during validation: {0}".format(avg_moves_val/val_iterations)
     print "Win percentage P1: {0}".format(wins_p1/(val_iterations))
     print "Win percentage P2: {0}".format(wins_p2/(val_iterations))
