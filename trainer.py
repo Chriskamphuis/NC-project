@@ -6,16 +6,6 @@ from tqdm import tqdm
 import numpy as np
 import time
 
-##########
-def printGame(board, winner):
-    print board
-    if (winner != 0):
-        print "\nPlayer {0} won!".format(winner)
-        
-    else:
-        print "\nThe game was a draw. (Boring!)"
-#########
-
 '''
     DEFINE PLAYERS AND NETWORKS
 '''
@@ -46,13 +36,14 @@ g = Game(p1, p2)#, board)
     MAIN TRAINING LOOP
 '''
 
-
 start = time.time()
 
 epochs = 20 #25
 tra_iterations = 10 #1000
 val_iterations = 10
 best_winrate = 0
+best_epoch = 0
+best_params = None
 
 for i in range(epochs):
 
@@ -109,6 +100,9 @@ for i in range(epochs):
             
         elif (winner == 0):
             draws += 1.0
+        
+        if j < 5:
+            test_game.print_board(winner)
         test_game.reset_board()
         test_game.switch_players()
             
@@ -120,7 +114,12 @@ for i in range(epochs):
 
     if(wins_p1/(val_iterations) > best_winrate):
         best_winrate = wins_p1/(val_iterations)
+        best_epoch = i
+        best_params = p1.get_params()
     
-print "Done! Best winrate is: {0}".format(best_winrate)
+print "Done! Best winrate is {0}% in epoch {1}".format(best_winrate, best_epoch)
 print str(time.time() - start) + " seconds"
 
+print "Saving best network..."
+p1.set_params(best_params)
+p1.save_network(best_winrate, best_epoch)
