@@ -283,8 +283,7 @@ class MonteCarloPlayer(Player):
                 return move
 
         board = main_game.board.copy()
-        
-        
+          
         # Variables that remember best move data
         best_move = -1
         best_pred = 0
@@ -303,7 +302,6 @@ class MonteCarloPlayer(Player):
             played = sum([1 for e in post_board[:, best_move] if e != 0])
             best_board[board.shape[0]-1-played, best_move] = self.value
             
-
         # Else exploit as usual
         else:
             for move in legal_moves:
@@ -321,16 +319,14 @@ class MonteCarloPlayer(Player):
                 if (best_move == -1 or pred > best_pred):
                     best_move = move
                     best_pred = pred
-                    best_board = post_board #######
+                    best_board = post_board
 
         # Train network on score and best choice
         if (training):
             
             # Determine Monte Carlo based score
             g = game.Game(Player(1), Player(2), board)
-            sample_score = g.sample_game(best_board, self, self.nr_samples) ###
-            #sample_score = g.sample_game(post_board, self, self.nr_samples)
-             
+            sample_score = g.sample_game(best_board, self, self.nr_samples)
             self.network.train(best_input, sample_score)
 
         return best_move
