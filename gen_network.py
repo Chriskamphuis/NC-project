@@ -4,6 +4,7 @@ from keras.models import Sequential
 from tqdm import tqdm
 import player
 from game import Game
+import matplotlib.pyplot as plt
 
 
 class Population():
@@ -66,7 +67,7 @@ class Population():
     # Swaps conv filters using crossover with probability self.crossover
     def apply_crossover(self):
         amount_filters = 0
-        for network in p.networks:
+        for network in self.networks:
             for layer in network.layers:
                 if type(layer) is Conv2D:
                     weights = layer.get_weights()[0]
@@ -86,6 +87,40 @@ class Population():
             self.swap_filters(fil_from[i], fil_to[i])
 
     def swap_filters(self, filter1, filter2):
+        if filter2 < filter1:
+            tmp = filter1
+            filter1 = filter2
+            filter2 = tmp
+        tmp = None
+        i = 0
+        n_t, l_t, c_t, f_t = None, None, None, None
+        for network in self.networks:
+            for layer in network.layers:
+                if type(layer) is Conv2D:
+                    weights = layer.get_weights()[0]
+                    for c in range(weights.shape[2]):
+                        for f in range(weights.shape[3]):
+                            if i == filter1:
+                                tmp, _ = layer.get_weights()
+                                tmp = tmp[:, :, c, f]
+                                n_t = network
+                                l_t = layer
+                                c_t = c
+                                f_t = f
+                            if i == filter2:
+                                tmp2, b2 = layer.get_weights()
+                                tmp2 = tmp2[:, :, c, f]
+                                new_f = layer.get_weights()[0]
+                                new_f[:, :, c, f] = tmp
+                                layer.set_weights([new_f, b2])
+                                for n in self.networks:
+                                    if n == n_t:
+                                        for l in n.layers:
+                                            if l == l_t:
+                                                wghts, b1 = l.get_weights()
+                                                wghts[:, :, c_t, f_t] = tmp
+                                                l.set_weights([wghts, b1])
+                            i += 1
         return
 
     def apply_mutation(self):
@@ -105,36 +140,34 @@ class Population():
                         layer.set_weights([w, b])
 
 if __name__ == '__main__':
-    p = player.GeneticPlayer(psize=5)
-    generations = 15
+    p = player.GeneticPlayer(psize=10)
+    generations = 20
     val_iterations = 100
-    
-    wins_p1 = 0.0
-    wins_p2 = 0.0
-    avg_moves_val = 0.0
-    draws = 0.0
 
-    for _ in tqdm(range(generations)):
-        p.evolve(2)
-    
-    p1 = p
-    p2 = player.Player(2)
-    test_game = Game(p1, p2)
-
-    for j in tqdm(range(val_iterations)):                                       
-        (winner, moves) = test_game.play_game(False)
-        avg_moves_val += moves
-        if (winner == p1.value):                                                
-            wins_p1 += 1.0
-        if (winner == p2.value):                                                
-            wins_p2 += 1.0
-        elif (winner == 0):                                                     
-            draws += 1.0
-        if j < 5:                                                               
-            test_game.print_board()
-        test_game.reset_board()                                                 
-        test_game.switch_players()
-    print "Average moves/game during validation:{0}".format(avg_moves_val/val_iterations)
-    print "Win percentage P1:{0}".format(wins_p1/(val_iterations))             
-    print "Win percentage P2:{0}".format(wins_p2/(val_iterations))             
-    print "Draw percentage:{0}".format(draws/(val_iterations)) 
+    idx = []
+    win_percentages = []
+    for z in tqdm(range(generations)):
+        p.evolve(100)
+        wins_p1 = 0.0
+        wins_p2 = 0.0
+        avg_moves_val = 0.0
+        draws = 0.0
+        p1 = p
+        p2 = player.Player(2, False)
+        test_game = Game(p1, p2)
+        for j in range(val_iterations):
+            (winner, moves) = test_game.play_game(False)
+            avg_moves_val += moves
+            if (winner == p1.value):
+                wins_p1 += 1.0
+            if (winner == p2.value):
+                wins_p2 += 1.0
+            elif (winner == 0):
+                draws += 1.0
+            test_game.reset_board()
+            test_game.switch_players()
+        win_percentages.append(wins_p1/val_iterations)
+        idx.append(z)
+    plt.plot(idx, win_percentages)
+    plt.show()
+    a = input('eind')
