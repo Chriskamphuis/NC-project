@@ -374,6 +374,11 @@ class GeneticPlayer(Player):
                 best_pred = pred
 
         return best_move
+   
+    # Loads a model from file
+    def load_network(self, network):
+        from keras import load_model
+        self.network = load_model(network)
 
     '''
     Evaluates the fitness of every network when they play against eachother
