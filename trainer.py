@@ -54,7 +54,7 @@ for i in range(epochs):
     avg_moves_val = 0.0
 
     # Adjust exploration chance
-    explore_rate = max(0.1, 1.0-(0.1*i))
+    explore_rate = 0.8 # max(0.1, 1.0-(0.1*i))
     p1.explore_rate=explore_rate
     p2.explore_rate=explore_rate
 
