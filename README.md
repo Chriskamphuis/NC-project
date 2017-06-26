@@ -11,3 +11,13 @@ The following files contain the important information for the project:
  * gen_player.py : Contains the class for the evolutionary player, also code to train it.
  * trainer.py : Contains the code to train all the player except the evolutionary player.
  * tester.py : Contains the code to evaluate the players.
+
+In order to train players using train.py, train.py needs to be altered for that specific player. 
+Every player and their respective networks have a line that needs to be uncommented in order to
+train that specific player. When we trained the players they were trained against a player 
+using the same kind of training style. (For example Qlearn vs Qlearn).
+
+In order to train the evolutionary player, gen_player.py needs to be run. It is possible to set
+the parameters at the bottom of the file. This player is trained using a pool of networks that 
+train against eachother. We trained our network using elitism, and a crossover rate and 
+mutation rate of both 0.01.
