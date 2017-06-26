@@ -276,13 +276,26 @@ class MonteCarloPlayer(Player):
     # Requests a move from the player, given a board
     def get_move(self, main_game, legal_moves, training):
 
+        board = main_game.board.copy()
+
         # Check for win-in-one if allowed
         if (self.win_in_one):
             move = self.check_win_in_one(main_game, legal_moves)
             if (move != -1):
-                return move
+                
+                # Train network on score and best choice
+                if (training):
 
-        board = main_game.board.copy()
+                    # Process move on copy of board
+                    best_board = board.copy()
+                    played = sum([1 for e in best_board[:, move] if e != 0])
+                    best_board[board.shape[0]-1-played, move] = self.value
+            
+                    # Determine Monte Carlo based score
+                    best_input = self.board_2_input(best_board)
+                    self.network.train(best_input, 1)
+                    
+                return move
           
         # Variables that remember best move data
         best_move = -1
@@ -295,11 +308,11 @@ class MonteCarloPlayer(Player):
         # If should explore, return random move
         if (training and policy_param <= self.explore_rate):
             choice = randint(0, len(legal_moves)-1)
-            best_move = choice
+            best_move = legal_moves[choice]
             
             # Process move on copy of board
             best_board = board.copy()
-            played = sum([1 for e in post_board[:, best_move] if e != 0])
+            played = sum([1 for e in best_board[:, best_move] if e != 0])
             best_board[board.shape[0]-1-played, best_move] = self.value
             
         # Else exploit as usual
@@ -312,7 +325,7 @@ class MonteCarloPlayer(Player):
                 post_board[board.shape[0]-1-played, move] = self.value
 
                 # Get prediction on post_board
-                input_arr = self.board_2_input(board)
+                input_arr = self.board_2_input(post_board)
                 pred = self.network.predict(input_arr)
 
                 # Update best move and score
@@ -324,9 +337,17 @@ class MonteCarloPlayer(Player):
         # Train network on score and best choice
         if (training):
             
+            # Determine starting random player from given player value
+            if (self.value == 1):
+                g = game.Game(Player(2), Player(1), board)
+            else:
+                g = game.Game(Player(1), Player(2), board)
+                
             # Determine Monte Carlo based score
-            g = game.Game(Player(1), Player(2), board)
             sample_score = g.sample_game(best_board, self, self.nr_samples)
+
+            # Train on sample score
+            best_input = self.board_2_input(best_board)
             self.network.train(best_input, sample_score)
 
         return best_move

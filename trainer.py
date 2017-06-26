@@ -10,22 +10,22 @@ import time
     DEFINE PLAYERS AND NETWORKS
 '''
 
-#net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.2)
+#net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.01)
 net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
 #net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.1)
 
 #p1 = Player(1, win_in_one = True)
-#p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = False)
-p1 = MonteCarloPlayer(1, net12, nr_samples=1000, win_in_one = True)
+#p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = True)
+p1 = MonteCarloPlayer(1, net12, nr_samples=100, win_in_one = True)
 #p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
 
-#net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.2)
+#net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.01)
 net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
 #net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.1)
 
 #p2 = Player(2, win_in_one = True)
-#p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = False)
-p2 = MonteCarloPlayer(2, net22, nr_samples=1000, win_in_one = True)
+#p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = True)
+p2 = MonteCarloPlayer(2, net22, nr_samples=100, win_in_one = True)
 #p2 = QLearningPlayer(2, net23, explore_rate=0.1, discount=0.9, win_in_one = True)
 
 g = Game(p1, p2)
@@ -37,9 +37,9 @@ g = Game(p1, p2)
 
 start = time.time()
 
-epochs = 20 #25
-tra_iterations = 10 #1000
-val_iterations = 10
+epochs = 10
+tra_iterations = 1000 #1000
+val_iterations = 100
 best_winrate = 0
 best_epoch = 0
 best_params = None
@@ -105,7 +105,8 @@ for i in range(epochs):
         test_game.reset_board()
         test_game.switch_players()
             
-    print "Epoch {0}:".format(i+1)
+    print "Epoch {0}:".format(i)
+    print "Average moves/game during training: {0}".format(avg_moves_train/tra_iterations)
     print "Average moves/game during validation: {0}".format(avg_moves_val/val_iterations)
     print "Win percentage P1: {0}".format(wins_p1/(val_iterations))
     print "Win percentage P2: {0}".format(wins_p2/(val_iterations))
@@ -122,3 +123,4 @@ print str(time.time() - start) + " seconds"
 print "Saving best network..."
 p1.set_params(best_params)
 p1.save_network(best_winrate, best_epoch)
+

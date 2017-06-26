@@ -135,17 +135,6 @@ class Game:
         old_playerOne = self.playerOne
         old_playerTwo = self.playerTwo
 
-        # Determine starting random player from given position        
-        val_one = self.playerOne.value
-        val_two = self.playerTwo.value
-
-        if (last_player == self.playerOne):
-            self.playerOne = Player(val_two)
-            self.playerTwo = Player(val_one)
-        else:
-            self.playerOne = Player(val_one)
-            self.playerTwo = Player(val_two) 
-
         # Play nr_samples random games
         score = 0.0
         for i in range(nr_samples):
@@ -154,19 +143,19 @@ class Game:
             self.board = board.copy()
 
             # Play random game
-            winner = self.play_game(False)
+            (winner,moves) = self.play_game(False)
 
             # Player who played last move before sampling won
-            if (winner[0] == last_player.value): 
-                score += 1.0
+            if (winner == last_player.value): 
+                score += (1.0 - (moves-1)*0.025)
 
             # Game was a draw
-            elif (winner[0] == 0):
+            elif (winner == 0):
                 score += 0.5
 
             # Player who did not play last move before sampling won        
             else:
-                score += 0.0
+                score += (0.0 + (moves-1)*0.025)
 
         # Place original settings back
         self.board = current_board
@@ -175,5 +164,3 @@ class Game:
         
         # Return final score
         return score/nr_samples
-        
-        
