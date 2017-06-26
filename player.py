@@ -360,10 +360,11 @@ class MonteCarloPlayer(Player):
 class GeneticPlayer(Player):
 
     # Initializes the player.
-    def __init__(self, value=1, network=None, population=None, psize=5):
+    def __init__(self, value=1, network=None, population=None, psize=5, win_in_one = True):
         self.value = value
         self.network = network
         self.population = population
+        self.win_in_one = win_in_one
         if self.population is None:
             self.population = gen_network.Population(population_size=psize)
 
@@ -376,6 +377,12 @@ class GeneticPlayer(Player):
         best_move = -1
         best_pred = 0
         
+        # Check for win-in-one if allowed
+        if (self.win_in_one):
+            move = self.check_win_in_one(main_game, legal_moves)
+            if (move != -1):
+                return move
+            
         board = main_game.board.copy()
     
         for move in legal_moves:
@@ -398,8 +405,8 @@ class GeneticPlayer(Player):
    
     # Loads a model from file
     def load_network(self, network):
-        from keras import load_model
-        self.network = load_model(network)
+        from keras.models import load_model
+        self.network = load_model('../Networks/' + network + '.h5')
 
     '''
     Evaluates the fitness of every network when they play against eachother
