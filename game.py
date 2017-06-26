@@ -122,12 +122,8 @@ class Game:
         print("printing board")
         print(self.board)
         print("Player {0} won!".format(winner))
-      
-      
-    ###########################################################################  
-    # Plays a random game from a given board position, then returns the score #
-    ###########################################################################
-    
+       
+    # Plays a random game fully from a given board position, then returns the score    
     def sample_game(self, board, last_player, nr_samples):
     
         # Save current board to memory
