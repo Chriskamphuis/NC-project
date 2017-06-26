@@ -3,14 +3,14 @@ from keras.layers import Dense, Conv2D, Flatten, Dropout
 from keras.models import Sequential
 from tqdm import tqdm
 import player
-from game import Game
+from game import *
 import matplotlib.pyplot as plt
 
 
 class Population():
 
     def __init__(self, name='genetic player', input_size=(3, 6, 7),
-                 crossover=0.01, mutation=0.1,
+                 crossover=0.01, mutation=0.01,
                  population_size=5, elitism=True):
         # Parameters
         self.name = name
@@ -66,17 +66,22 @@ class Population():
 
     # Swaps conv filters using crossover with probability self.crossover
     def apply_crossover(self):
+        net = 0
         amount_filters = 0
         for network in self.networks:
             for layer in network.layers:
                 if type(layer) is Conv2D:
                     weights = layer.get_weights()[0]
                     amount_filters += weights.shape[2] * weights.shape[3]
-        to_change = np.random.choice(amount_filters,
+            if net == 0:
+                min_amount = amount_filters
+            net += 1
+        to_change = np.random.choice(amount_filters-min_amount,
                                      size=(int(self.crossover *
                                                amount_filters *
                                                2)),
                                      replace=False)
+        to_change = [e+min_amount for e in to_change]
         fil_from = to_change[:len(to_change)/2]
         fil_to = to_change[len(to_change)/2:]
 
@@ -140,12 +145,14 @@ class Population():
                         layer.set_weights([w, b])
 
 if __name__ == '__main__':
-    p = player.GeneticPlayer(psize=10)
-    generations = 20
+    p = player.GeneticPlayer(psize=40)
+    generations = 600
     val_iterations = 100
 
     idx = []
     win_percentages = []
+
+    best_val = 0
     for z in tqdm(range(generations)):
         p.evolve(100)
         wins_p1 = 0.0
@@ -153,7 +160,7 @@ if __name__ == '__main__':
         avg_moves_val = 0.0
         draws = 0.0
         p1 = p
-        p2 = player.Player(2, False)
+        p2 = player.Player(2, True)
         test_game = Game(p1, p2)
         for j in range(val_iterations):
             (winner, moves) = test_game.play_game(False)
@@ -167,7 +174,10 @@ if __name__ == '__main__':
             test_game.reset_board()
             test_game.switch_players()
         win_percentages.append(wins_p1/val_iterations)
+        if win_percentages[-1] > best_val:
+            best_val = win_percentages[-1]
+            p.network.save("models/network_gen{}_val{}.h5".format(z, best_val))
+
         idx.append(z)
     plt.plot(idx, win_percentages)
-    plt.show()
-    a = input('eind')
+    plt.savefig('performance.png')

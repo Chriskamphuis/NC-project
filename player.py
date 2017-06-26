@@ -339,10 +339,12 @@ class MonteCarloPlayer(Player):
 class GeneticPlayer(Player):
 
     # Initializes the player.
-    def __init__(self, value=1, network=None, population=None, psize=5):
+    def __init__(self, value=1, network=None, population=None, psize=5,
+                 win_in_one=True):
         self.value = value
         self.network = network
         self.population = population
+        self.win_in_one = win_in_one
         if self.population is None:
             self.population = gen_network.Population(population_size=psize)
 
@@ -352,6 +354,12 @@ class GeneticPlayer(Player):
     def get_move(self, main_game, legal_moves, training):
         if self.network is None:
             raise ValueError('The player does not know a network yet.')
+        
+        if (self.win_in_one):
+            move = self.check_win_in_one(main_game, legal_moves)
+            if (move != -1):
+                return move 
+
         best_move = -1
         best_pred = 0
         
