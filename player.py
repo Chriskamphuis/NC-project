@@ -395,6 +395,11 @@ class GeneticPlayer(Player):
                 best_pred = pred
 
         return best_move
+   
+    # Loads a model from file
+    def load_network(self, network):
+        from keras import load_model
+        self.network = load_model(network)
 
     '''
     Evaluates the fitness of every network when they play against eachother
@@ -404,7 +409,7 @@ class GeneticPlayer(Player):
     def evolve(self, iterations):
         fitness = [0 for _ in range(len(self.population.networks))]
         board = np.zeros((6, 7), dtype=np.int8)
-        for perm in tqdm(permutations(self.population.networks, 2)):
+        for perm in permutations(self.population.networks, 2):
             a = time()
             p1 = GeneticPlayer(1, network=perm[0], population=[])
             p2 = GeneticPlayer(2, network=perm[1], population=[])
@@ -420,4 +425,5 @@ class GeneticPlayer(Player):
                     fitness[self.population.networks.index(perm[1])] += .5
         self.population.train(fitness)
         self.population.apply_mutation()
+        self.population.apply_crossover()
         self.network = self.population.networks[0]
