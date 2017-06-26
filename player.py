@@ -354,10 +354,10 @@ class MonteCarloPlayer(Player):
 
 
 ########################
-# GENETIC STATE PLAYER #
+# EVOLUTIONARY PLAYER #
 ########################
 
-class GeneticPlayer(Player):
+class EvolutionaryPlayer(Player):
 
     # Initializes the player.
     def __init__(self, value=1, network=None, population=None, psize=5, win_in_one=True):
@@ -412,7 +412,7 @@ class GeneticPlayer(Player):
     # Loads a model from file
     def load_network(self, network):
         from keras.models import load_model
-        self.network = load_model('../Networks/' + network + '.h5')
+        self.network = load_model('Networks/' + network + '.h5')
 
     '''
     Evaluates the fitness of every network when they play against eachother

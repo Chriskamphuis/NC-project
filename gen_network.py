@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 class Population():
 
-    def __init__(self, name='genetic player', input_size=(3, 6, 7),
+    def __init__(self, name='evolutionary player', input_size=(3, 6, 7),
                  crossover=0.01, mutation=0.01,
                  population_size=5, elitism=True):
         # Parameters
@@ -145,7 +145,7 @@ class Population():
                         layer.set_weights([w, b])
 
 if __name__ == '__main__':
-    p = player.GeneticPlayer(psize=40)
+    p = player.EvolutionaryPlayer(psize=40)
     generations = 600
     val_iterations = 100
 

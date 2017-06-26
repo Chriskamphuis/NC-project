@@ -11,34 +11,43 @@ import time
     DEFINE PLAYERS AND NETWORKS
 '''
 
-#net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.2)
+'''
+Player 1
+'''
+net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.2)
 #net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
-net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.1)
+#net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.1)
 
 #p1 = Player(1)
-#p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = True)
+p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = True)
 #p1 = MonteCarloPlayer(1, net12, nr_samples=10, win_in_one = True)
-p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
-#p1 = GeneticPlayer(1)
+#p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
+#p1 = EvolutionaryPlayer(1)
 
+'''
+Player 2
+'''
 #net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.2)
-net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
-#net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.1)
+#net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
+net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.1)
 
 #p2 = Player(2)
 #p2 = EndStatePlayer(2, net21, explore_rate=0.1, win_in_one = True)
-p2 = MonteCarloPlayer(2, net22, nr_samples=10, win_in_one = True)
-#p2 = QLearningPlayer(2, net23, explore_rate=0.1, discount=0.9, win_in_one = True)
-#p2 = GeneticPlayer(2)
+#p2 = MonteCarloPlayer(2, net22, nr_samples=10, win_in_one = True)
+p2 = QLearningPlayer(2, net23, explore_rate=0.1, discount=0.9, win_in_one = True)
+#p2 = EvolutionaryPlayer(2)
 
-#p1.load_network('Endstate1_0.01_0.777_1')
+'''
+Load saved best performing networks
+'''
+p1.load_network('Endstate1_0.01_0.777_1')
 #p1.load_network('MonteCarlo1_0.01_0.94_4')
-p1.load_network('Qlearning1_0.1_0.951_66')
+#p1.load_network('Qlearning1_0.1_0.951_66')
 #p1.load_network('network_gen208_val0.65')
 
 #p2.load_network('Endstate1_0.01_0.777_1')
-p2.load_network('MonteCarlo1_0.01_0.94_4')
-#p2.load_network('Qlearning1_0.1_0.951_66')
+#p2.load_network('MonteCarlo1_0.01_0.94_4')
+p2.load_network('Qlearning1_0.1_0.951_66')
 #p2.load_network('network_gen208_val0.65')
 
 g = Game(p1, p2)

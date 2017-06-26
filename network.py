@@ -87,12 +87,12 @@ class Network():
     def save_network(self, winrate, epoch):
 
         params = L.get_all_param_values(self.network)
-        np.savez(os.path.join('../Networks/', self.name + '_' + str(self.learning_rate) + '_' + str(winrate) + '_' + str(epoch) + '.npz'), params=params)
+        np.savez(os.path.join('Networks/', self.name + '_' + str(self.learning_rate) + '_' + str(winrate) + '_' + str(epoch) + '.npz'), params=params)
         
     # Load existing network
     def load_network(self, saved_name):
 
-        npz = np.load('../Networks/' + saved_name + '.npz') # load stored parameters
+        npz = np.load('Networks/' + saved_name + '.npz') # load stored parameters
         L.set_all_param_values(self.network, npz['params']) # set parameters
 
     # Save params

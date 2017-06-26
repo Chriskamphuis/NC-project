@@ -10,6 +10,9 @@ import time
     DEFINE PLAYERS AND NETWORKS
 '''
 
+'''
+Player 1
+'''
 net11 = Network("Endstate1", [3, 6, 7], learning_rate=0.01)
 #net12 = Network("MonteCarlo1", [3, 6, 7], learning_rate=0.01)
 #net13 = Network("Qlearning1", [3, 6, 7], learning_rate=0.1)
@@ -19,6 +22,9 @@ p1 = EndStatePlayer(1, net11, explore_rate=0.1, win_in_one = True)
 #p1 = MonteCarloPlayer(1, net12, nr_samples=100, win_in_one = True)
 #p1 = QLearningPlayer(1, net13, explore_rate=0.1, discount=0.9, win_in_one = True)
 
+'''
+Player 2
+'''
 net21 = Network("Endstate2", [3, 6, 7], learning_rate=0.01)
 #net22 = Network("MonteCarlo2", [3, 6, 7], learning_rate=0.01)
 #net23 = Network("Qlearning2", [3, 6, 7], learning_rate=0.1)
@@ -37,8 +43,8 @@ g = Game(p1, p2)
 
 start = time.time()
 
-epochs = 200
-tra_iterations = 1000 #1000
+epochs = 100
+tra_iterations = 1000 
 val_iterations = 1000
 best_winrate = 0
 best_epoch = 0
@@ -54,7 +60,7 @@ for i in range(epochs):
     avg_moves_val = 0.0
 
     # Adjust exploration chance
-    explore_rate = 0.8 # max(0.1, 1.0-(0.1*i))
+    explore_rate = max(0.1, 1.0-(0.1*i))
     p1.explore_rate=explore_rate
     p2.explore_rate=explore_rate
 
@@ -80,7 +86,7 @@ for i in range(epochs):
         g.switch_players()
         
     # Validation cycle
-    test_game = Game(p1, Player(2))#, board) #Game(p1, Player(2), board)
+    test_game = Game(p1, Player(2))
     
     avg_moves_val = 0.0
     wins_p1 = 0.0
