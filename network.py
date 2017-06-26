@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 import matplotlib.pyplot as plt
 from IPython import display
@@ -86,7 +87,7 @@ class Network():
     def save_network(self, winrate, epoch):
 
         params = L.get_all_param_values(self.network)
-        np.savez(os.path.join('../Networks/', self.name + '_' + str(self.learning_rate) + '_' + str(winrate) + '_' + str(i) + '.npz'), params=params)
+        np.savez(os.path.join('../Networks/', self.name + '_' + str(self.learning_rate) + '_' + str(winrate) + '_' + str(epoch) + '.npz'), params=params)
         
     # Load existing network
     def load_network(self, saved_name):
